@@ -36,7 +36,7 @@ response.setStatus = function(message, status, start_time) {
     res.append(utils.htmlEncode(sprintf(' (%s)', status)));
     if (typeof start_time === 'number') {
         var duration = new Date().getTime() - start_time;
-        res.append(sprintf(', duration of the request: %dms', duration));
+        res.append(sprintf(', display duration: %dms', duration));
     }
     $('#status').html(res);
 };
