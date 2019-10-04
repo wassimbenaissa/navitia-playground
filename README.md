@@ -21,6 +21,14 @@ npm install && npx bower install
 npx gulp dev
 ```
 
+### Troubleshooting
+
+*   you may have troubles to install `npx` on some distributions. If you encounter errors like this:
+    > npm WARN notsup Not compatible with your operating system or architecture: fsevents@1.2.9
+
+    Try removing the `node_modules` directory, then launch `npm install && npm install --no-optional npx && ./node_modules/.bin/npx bower install`
+    Then run `./node_modules/.bin/npx gulp dev` to launch the application
+
 ## License
 
 This project is under the [MIT license](LICENSE). See the [bower file](bower.json) for the running dependencies and the [npm file](package.json) for dev dependencies.
