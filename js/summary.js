@@ -665,6 +665,10 @@ summary.make.equipment_report = function(context, json) {
         .append(sprintf(', %d stop_area_equipments', (json.stop_area_equipments || []).length));
 };
 
+summary.make.terminus_schedule = function(context, json) {
+    return summary.makeRoutePoint(context, json);
+};
+
 summary.make.stop_area_equipment = function(context, json) {
     var equip_details = (json.equipment_details || []);
     var res = $('<span>')
