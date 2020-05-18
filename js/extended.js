@@ -149,23 +149,7 @@ extended.make.section = function(context, json) {
 };
 
 extended.make.stop_schedule = function(context, json) {
-    var result = $('<div class="list"/>');
-    if (Array.isArray(json.links) && json.links.length) {
-        result.append(response.render(context, json.links, 'links', 'links'));
-    }
-    if (Array.isArray(json.display_informations.links) && json.display_informations.links.length) {
-        result.append(response.render(context, json.display_informations.links, 'links', 'display_informations.links'));
-    }
-    if (json.first_datetime) {
-        result.append(response.render(context, json.first_datetime, 'date_time', 'first_datetime'));
-    }
-    if (json.last_datetime) {
-        result.append(response.render(context, json.last_datetime, 'date_time', 'last_datetime'));
-    }
-    json.date_times.forEach(function(date_time, i) {
-        result.append(response.render(context, date_time, 'date_time', 'date_times', i));
-    });
-    return result;
+    return extended.defaultStopSchedule(context, json);
 };
 
 extended.make.route_schedule = function(context, json) {
@@ -322,6 +306,30 @@ extended.make.stop_area_equipment = function(context, json) {
         res.append(response.render(context, obj, 'equipment_detail', 'equipment_details', i));
     });
     return res;
+};
+
+extended.make.terminus_schedule = function(context, json) {
+    return extended.defaultStopSchedule(context, json);
+};
+
+extended.defaultStopSchedule = function(context, json) {
+    var result = $('<div class="list"/>');
+    if (Array.isArray(json.links) && json.links.length) {
+        result.append(response.render(context, json.links, 'links', 'links'));
+    }
+    if (Array.isArray(json.display_informations.links) && json.display_informations.links.length) {
+        result.append(response.render(context, json.display_informations.links, 'links', 'display_informations.links'));
+    }
+    if (json.first_datetime) {
+        result.append(response.render(context, json.first_datetime, 'date_time', 'first_datetime'));
+    }
+    if (json.last_datetime) {
+        result.append(response.render(context, json.last_datetime, 'date_time', 'last_datetime'));
+    }
+    json.date_times.forEach(function(date_time, i) {
+        result.append(response.render(context, date_time, 'date_time', 'date_times', i));
+    });
+    return result;
 };
 
 //
