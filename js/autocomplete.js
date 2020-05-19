@@ -98,7 +98,7 @@ autocomplete.autocompleteTree = {
     paramValue : {
         traveler_type : ['luggage', 'standard', 'fast_walker', 'slow_walker'],
         datetime_represents : ['arrival', 'departure'],
-        data_freshness: ['base_schedule', 'adapted_schedule', 'realtime'],
+        data_freshness: ['base_schedule', 'realtime'],
         debug: autocomplete._booleanValues,
         wheelchair: autocomplete._booleanValues,
         disable_geojson: autocomplete._booleanValues,
