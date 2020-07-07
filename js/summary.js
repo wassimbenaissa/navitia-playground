@@ -708,6 +708,49 @@ summary.make.equipment_detail = function(context, json) {
     return res;
 };
 
+summary.make.path = function(context, json) {
+    var res = $('<span>')
+        .append(pictos.makeSnPicto(json.mode))
+        .append(' > ')
+        .append(sprintf('%d instructions', json.path.length));
+    return res;
+};
+
+summary.make.instruction = function(context, path) {
+    var res = $('<span>');
+        if (path.instruction) {
+            res.append(path.instruction);
+        } else {
+            if (path.direction === parseInt('0',10)) {
+                res.append('Continue on ');
+            } else if (path.direction < parseInt('0', 10)){
+                res.append('Turn left onto ');
+            } else {
+                res.append('Turn right onto ');
+            }
+            if (path.name === '') {
+                $('<span/>')
+                    .addClass('street')
+                    .text('Street Name Unknown')
+                .appendTo(res);
+            } else {
+                $('<span/>')
+                    .addClass('street')
+                    .text(path.name)
+                .appendTo(res);
+            }
+            res.append('. Go for ');
+            $('<span/>')
+                .addClass('length')
+                .text(sprintf('%s m.',path.length))
+            .appendTo(res);
+        }
+        res.append(' (duration: ');
+        res.append(path.duration);
+        res.append(' s)');
+    return res;
+};
+
 summary.make.note = function(context, json) {
     return json.value;
 };

@@ -137,6 +137,9 @@ extended.make.section = function(context, json) {
     if (json.to) {
         result.append(response.render(context, json.to, 'place', 'to'));
     }
+    if (json.path) {
+        result.append(response.render(context, json, 'path', 'guidance'));
+    }
     (json.ridesharing_journeys || []).forEach(function(j, i) {
         result.append(response.render(context, j, 'journey', 'ridesharing_journeys', i));
     });
@@ -304,6 +307,14 @@ extended.make.stop_area_equipment = function(context, json) {
     var res = extended.defaultExtended(context, 'equipment_details', json);
     (json.equipment_details || []).forEach(function(obj, i) {
         res.append(response.render(context, obj, 'equipment_detail', 'equipment_details', i));
+    });
+    return res;
+};
+
+extended.make.path = function(context, json) {
+    var res = extended.defaultExtended(context, 'paths', json);
+    (json.path || []).forEach(function(obj, i) {
+        res.append(response.render(context, obj, 'instruction', 'instructions', i));
     });
     return res;
 };

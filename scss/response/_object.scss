@@ -30,6 +30,21 @@
   color: $light-green;
 }
 
+.street {
+  color: $dark-gray;
+  font-weight: bold;
+}
+
+.next-street {
+  color: $dark-gray;
+  font-weight: bold;
+}
+
+.length {
+  color: $dark-gray;
+  font-weight: bold;
+}
+
 .stands-status.closed {
     color: $dark-red;
 }
