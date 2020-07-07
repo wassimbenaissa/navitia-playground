@@ -712,23 +712,23 @@ summary.make.path = function(context, json) {
     var res = $('<span>')
         .append(pictos.makeSnPicto(json.mode))
         .append(' > ')
-        .append(sprintf('%d instructions', json.path.length));
+        .append(sprintf('%d paths', json.path.length));
     return res;
 };
 
-summary.make.instruction = function(context, path) {
+summary.make.instruction = function(context, path_item) {
     var res = $('<span>');
-        if (path.instruction) {
-            res.append(path.instruction);
+        if (path_item.instruction) {
+            res.append(path_item.instruction);
         } else {
-            if (path.direction === parseInt('0',10)) {
+            if (path_item.direction === parseInt('0',10)) {
                 res.append('Continue on ');
-            } else if (path.direction < parseInt('0', 10)){
+            } else if (path_item.direction < parseInt('0', 10)){
                 res.append('Turn left onto ');
             } else {
                 res.append('Turn right onto ');
             }
-            if (path.name === '') {
+            if (path_item.name === '') {
                 $('<span/>')
                     .addClass('street')
                     .text('Street Name Unknown')
@@ -736,17 +736,17 @@ summary.make.instruction = function(context, path) {
             } else {
                 $('<span/>')
                     .addClass('street')
-                    .text(path.name)
+                    .text(path_item.name)
                 .appendTo(res);
             }
             res.append('. Go for ');
             $('<span/>')
                 .addClass('length')
-                .text(sprintf('%s m.',path.length))
+                .text(sprintf('%s m.',path_item.length))
             .appendTo(res);
         }
         res.append(' (duration: ');
-        res.append(path.duration);
+        res.append(path_item.duration);
         res.append(' s)');
     return res;
 };
