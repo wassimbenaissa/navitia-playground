@@ -28,6 +28,8 @@ var utils;
 
 var map = {};
 
+var jawg = '9bHKgmlnYBVN0RILGGVn9t5mV1htebujO8fvecasKWZPb1apHmEFD9nOpWLjrYM7';
+
 map.DrawSectionOption = {
     DRAWSTART: 2, // 10
     DRAWEND: 1, // 01
@@ -208,12 +210,14 @@ map._makeTileLayers = function() {
         });
     };
     return {
-        'Bright': L.tileLayer('https://tile.jawg.io/8030075a-bdf3-4b3a-814e-e28ab5880b40/{z}/{x}/{y}.png?access-token=9bHKgmlnYBVN0RILGGVn9t5mV1htebujO8fvecasKWZPb1apHmEFD9nOpWLjrYM7', {
-            attribution: courtesy('<a href="https://www.navitia.io/">navitia</a>'),
+        'Bright': L.tileLayer('https://tile.jawg.io/8030075a-bdf3-4b3a-814e-e28ab5880b40/{z}/{x}/{y}.png?access-token=' + jawg, {
+            attribution: courtesy('<a href="https://www.jawg.io" target="_blank">&copy; Jawg</a> - ' +
+                '<a href="https://www.openstreetmap.org" target="_blank">&copy; OpenStreetMap</a>&nbsp;contributors'),
             detectRetina: true
         }),
-        'Dark': L.tileLayer('https://tile.jawg.io/d3fdb780-a086-4c52-ba10-40106332bd0c/{z}/{x}/{y}.png?access-token=9bHKgmlnYBVN0RILGGVn9t5mV1htebujO8fvecasKWZPb1apHmEFD9nOpWLjrYM7', {
-            attribution: courtesy('<a href="https://www.jawg.io" target="_blank">&copy; Jawg</a> - <a href="https://www.openstreetmap.org" target="_blank">&copy; OpenStreetMap</a>&nbsp;contributors'),
+        'Dark': L.tileLayer('https://tile.jawg.io/d3fdb780-a086-4c52-ba10-40106332bd0c/{z}/{x}/{y}.png?access-token=' + jawg, {
+            attribution: courtesy('<a href="https://www.jawg.io" target="_blank">&copy; Jawg</a> - ' +
+                '<a href="https://www.openstreetmap.org" target="_blank">&copy; OpenStreetMap</a>&nbsp;contributors'),
             detectRetina: true
         }),
         'HOT': L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
@@ -230,8 +234,9 @@ map._makeTileLayers = function() {
             attribution: copyOSM,
             detectRetina: true
         }),
-        'Terrain': L.tileLayer('https://tile.jawg.io/d3fdb780-a086-4c52-ba10-40106332bd0c/{z}/{x}/{y}.png?access-token=9bHKgmlnYBVN0RILGGVn9t5mV1htebujO8fvecasKWZPb1apHmEFD9nOpWLjrYM7', {
-            attribution: courtesy('<a href="https://www.jawg.io" target="_blank">&copy; Jawg</a> - <a href="https://www.openstreetmap.org" target="_blank">&copy; OpenStreetMap</a>&nbsp;contributors'),
+        'Terrain': L.tileLayer('https://tile.jawg.io/d3fdb780-a086-4c52-ba10-40106332bd0c/{z}/{x}/{y}.png?access-token=' + jawg , {
+            attribution: courtesy('<a href="https://www.jawg.io" target="_blank">&copy; Jawg</a> - ' +
+                '<a href="https://www.openstreetmap.org" target="_blank">&copy; OpenStreetMap</a>&nbsp;contributors'),
             detectRetina: true
         }),
         'Toner': makeStamenTileLayer('toner-lite'),
