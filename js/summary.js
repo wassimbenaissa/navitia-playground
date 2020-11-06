@@ -103,7 +103,7 @@ summary.make.journey = function(context, json) {
             if (s.type === 'ridesharing') {
                 var ridesharing = $('<span>').append(pictos.makeSnPicto('ridesharing'));
                 var infos = s.ridesharing_informations;
-                if (infos.driver.image) {
+                if (infos.driver && infos.driver.image) {
                     ridesharing.append(pictos.makeImgFromUrl(infos.driver.image, infos.driver.alias));
                 }
                 add(ridesharing);
@@ -317,25 +317,41 @@ summary.make.section = function(context, section) {
     }
     if (section.ridesharing_informations) {
         var infos = section.ridesharing_informations;
-        res.append(', driver: ');
-        if (infos.driver.image) {
-            res.append(pictos.makeImgFromUrl(infos.driver.image, infos.driver.alias));
+        if (infos.driver) {
+            if (infos.driver.image) {
+                res.append(', driver: ');
+                res.append(pictos.makeImgFromUrl(infos.driver.image, infos.driver.alias));
+            }
+            if (infos.driver.gender && infos.driver.gender === 'male') {
+                res.append(' Mr.&nbsp;');
+            } else if (infos.driver.gender && infos.driver.gender === 'female') {
+                res.append(' Ms.&nbsp;');
+            }
+            if (infos.driver.alias) {
+                res.append(sprintf(' %s', infos.driver.alias));
+            }
+            if (infos.driver.rating &&
+                infos.driver.rating.value &&
+                infos.driver.rating.scale_max &&
+                infos.driver.rating.scale_min &&
+                infos.driver.rating.count) {
+                res.append(sprintf(' %f/%f (%d reviews), ',
+                                   infos.driver.rating.value - infos.driver.rating.scale_min,
+                                   infos.driver.rating.scale_max - infos.driver.rating.scale_min,
+                                   infos.driver.rating.count));
+            }
         }
-        if (infos.driver.gender === 'male') {
-            res.append(' Mr.&nbsp;');
-        } else if (infos.driver.gender === 'female') {
-            res.append(' Ms.&nbsp;');
+        if (infos.seats) {
+            if (infos.seats.available) {
+                res.append(sprintf(', available seats: %d', infos.seats.available));
+            }
+            if (infos.seats.total) {
+                res.append(sprintf(', total seats %d', infos.seats.total));
+            }
         }
-        res.append(utils.htmlEncode(infos.driver.alias));
-        res.append(sprintf(' %f/%f (%d reviews), ',
-                           infos.driver.rating.value - infos.driver.rating.scale_min,
-                           infos.driver.rating.scale_max - infos.driver.rating.scale_min,
-                           infos.driver.rating.count));
-        res.append(sprintf('available seats: %d', infos.seats.available));
-        if (infos.seats.total) {
-            res.append(sprintf('/%d', infos.seats.total));
+        if (infos.network && infos.operator) {
+            res.append(utils.htmlEncode(sprintf(', network: %s, operator: %s', infos.network, infos.operator)));
         }
-        res.append(utils.htmlEncode(sprintf(', network: %s, operator: %s', infos.network, infos.operator)));
     }
     return res;
 };
