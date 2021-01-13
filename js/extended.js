@@ -222,6 +222,10 @@ extended.make.stop_point = function(context, json) {
 
 extended.make.disruption = function(context, json) {
     var res = $('<div class="list"/>');
+    (json.application_patterns || []).forEach(function(obj, i) {
+        res.append(response.render(context, obj, 'application_pattern', 'application_patterns', i));
+    });
+
     if (json.application_periods) {
         res.append(response.render(context,
                                    json.application_periods,

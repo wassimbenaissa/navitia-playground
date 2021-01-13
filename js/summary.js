@@ -535,6 +535,14 @@ summary.make.message = function(context, json) {
     return res;
 };
 
+summary.make.application_pattern = function(context, json) {
+    var res = $('<span/>');
+    var begin = utils.makeDate(json.application_period.begin);
+    var end = utils.makeDate(json.application_period.end);
+    res.text(sprintf('de %s à %s', utils.formatDate(begin), utils.formatDate(end)));
+    return res;
+};
+
 summary.make.application_periods = function(context, json) {
     var res = $('<span/>');
     var text = json.map(function(period) {
