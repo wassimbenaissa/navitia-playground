@@ -216,3 +216,16 @@ utils.makeDistanceSummary = function(d) {
   if (d >= 1000) { return sprintf(format, d / 1000.0, 'km'); }
   return sprintf(format, d, 'm');
 };
+
+utils.makeDate = function(d) {
+        if (typeof d !== 'string') { return null; }
+        var year = + d.slice(0, 4);
+        var month = + d.slice(4, 6) - 1;
+        var day = + d.slice(6, 8);
+        return new Date(year, month, day);
+    }
+
+utils.formatDate = function(d) {
+        if (!(d instanceof Date)) { return '???'; }
+        return sprintf('%04d-%02d-%02d', d.getFullYear(), d.getMonth() + 1, d.getDate());
+    }
