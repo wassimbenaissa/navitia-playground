@@ -539,7 +539,7 @@ summary.make.application_pattern = function(context, json) {
     var res = $('<span/>');
     var begin = utils.makeDate(json.application_period.begin);
     var end = utils.makeDate(json.application_period.end);
-    res.text(sprintf('begin %s end %s', utils.formatDate(begin), utils.formatDate(end)));
+    res.text(sprintf('since %s until %s', utils.formatDate(begin), utils.formatDate(end)));
     return res;
 };
 
