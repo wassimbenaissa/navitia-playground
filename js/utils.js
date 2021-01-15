@@ -225,7 +225,27 @@ utils.makeDate = function(d) {
         return new Date(year, month, day);
 };
 
+utils.formatTime = function(time) {
+        if (typeof time !== 'string') { return null; }
+        var hour = time.slice(0, 2);
+        var minute = time.slice(2, 4);
+        var second = time.slice(4, 6);
+        return sprintf('%s:%s:%s', hour, minute, second);
+};
+
 utils.formatDate = function(d) {
         if (!(d instanceof Date)) { return '???'; }
         return sprintf('%04d-%02d-%02d', d.getFullYear(), d.getMonth() + 1, d.getDate());
+};
+
+utils.formatWeek = function(week_pattern) {
+    var result = [];
+    if (week_pattern.sunday === true){ result.push('Sun');}
+    if (week_pattern.monday === true){ result.push('Mon');}
+    if (week_pattern.tuesday === true){ result.push('Tues');}
+    if (week_pattern.wednesday === true){ result.push('Wed');}
+    if (week_pattern.thursday === true){ result.push('Thurs');}
+    if (week_pattern.friday === true){ result.push('Fri');}
+    if (week_pattern.saturday === true){ result.push('Sat');}
+    return result.join(', ');
 };

@@ -539,8 +539,19 @@ summary.make.application_pattern = function(context, json) {
     var res = $('<span/>');
     var begin = utils.makeDate(json.application_period.begin);
     var end = utils.makeDate(json.application_period.end);
-    res.text(sprintf('since %s until %s', utils.formatDate(begin), utils.formatDate(end)));
+    var week = utils.formatWeek(json.week_pattern);
+
+    res.text(sprintf('since %s until %s on %s', utils.formatDate(begin), utils.formatDate(end), week));
+    res.append(' in ');
+    res.append(summary.run(context, 'time_slots', json.time_slots));
     return res;
+};
+
+summary.make.time_slots = function(context, json) {
+    var text = json.map(function(time_slot) {
+        return sprintf('%s-%s', utils.formatTime(time_slot.begin), utils.formatTime(time_slot.end));
+    }).join(' or ');
+    return $('<span>').text(text);
 };
 
 summary.make.application_periods = function(context, json) {
