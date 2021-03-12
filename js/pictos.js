@@ -41,7 +41,6 @@ pictos.makePtPicto = function(json) {
     case 'physical_mode:BikeSharingService': img = 'BikeSharingService'; break;
     case 'physical_mode:Car': img = 'Car'; break;
     case 'physical_mode:Coach': img = 'Coach'; break;
-    case 'physical_mode:Funicular': img = 'Funicular'; break;
     case 'physical_mode:Metro': img = 'Metro'; break;
     case 'physical_mode:Taxi': img = 'Taxi'; break;
     case 'physical_mode:Tramway': img = 'Tramway'; break;
@@ -49,6 +48,10 @@ pictos.makePtPicto = function(json) {
     case 'physical_mode:CheckIn': img = 'CheckIn'; break;
     case 'physical_mode:CheckOut': img = 'CheckOut'; break;
     case 'physical_mode:Shuttle': img = 'Shuttle'; break;
+
+    case 'physical_mode:Funicular':
+    case 'physical_mode:SuspendedCableCar':
+        img = 'Funicular'; break;
 
     case 'physical_mode:Bus':
     case 'physical_mode:BusRapidTransit':
@@ -59,6 +62,7 @@ pictos.makePtPicto = function(json) {
     case 'physical_mode:LocalTrain':
     case 'physical_mode:LongDistanceTrain':
     case 'physical_mode:Train':
+    case 'physical_mode:RailShuttle':
         img = 'Train'; break;
 
     case 'physical_mode:Boat':
