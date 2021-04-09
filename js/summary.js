@@ -703,17 +703,17 @@ summary.make.free_floating = function(context, json) {
         .appendTo(res);
     }
     res.append(sprintf('%s', json.type));
-    add('provider', json.provider_name)
+    add('provider', json.provider_name);
     res.append(', distance: ');
     $('<span/>')
         .addClass('gray-and-bold')
         .text(sprintf('%s m', json.distance))
     .appendTo(res);
     if (json.public_id) {
-        add('public id', json.public_id)
+        add('public id', json.public_id);
     }
     if (json.battery) {
-        add('battery', json.battery)
+        add('battery', json.battery);
     }
     return res;
 };
