@@ -160,6 +160,9 @@ map.makeFeatures = {
     poi: function(context, json) {
         return map._makeMarker(context, 'poi', json);
     },
+    free_floating: function(context, json) {
+        return map._makeMarker(context, 'free_floating', json);
+    },
     connection: function(context, json) {
         return utils.flatMap([json.origin, json.destination], function(json) {
             return map._makeMarker(context, 'stop_point', json);

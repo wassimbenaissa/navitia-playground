@@ -693,6 +693,31 @@ summary.make.terminus_schedule = function(context, json) {
     return summary.makeRoutePoint(context, json);
 };
 
+summary.make.free_floating = function(context, json) {
+    var res = $('<span/>');
+    function add(s, n) {
+        res.append(sprintf(', %s: ',s));
+        $('<span/>')
+            .addClass('gray-and-bold')
+            .text(sprintf('%s', n))
+        .appendTo(res);
+    }
+    res.append(sprintf('%s', json.type));
+    add('provider', json.provider_name);
+    res.append(', distance: ');
+    $('<span/>')
+        .addClass('gray-and-bold')
+        .text(sprintf('%s m', json.distance))
+    .appendTo(res);
+    if (json.public_id) {
+        add('public id', json.public_id);
+    }
+    if (json.battery) {
+        add('battery', json.battery);
+    }
+    return res;
+};
+
 summary.make.stop_area_equipment = function(context, json) {
     var equip_details = (json.equipment_details || []);
     var res = $('<span>')
