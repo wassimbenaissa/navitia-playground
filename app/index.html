@@ -26,21 +26,21 @@
 	<div id="raw">
 		<div class="col">
 			<h2>You’re beginner? Use templated examples</h2>
-			<div class="rubriques">	
-				<h3><img class="pictofeatures" src='img/journey.png'></h3>		
+			<div class="rubriques">
+				<h3><img class="pictofeatures" src='img/journey.png'></h3>
 				<a href="play.html?request=https%3A%2F%2Fapi.navitia.io%2Fv1%2Fcoverage%2F%257Bregion.id%257D%2Fjourneys%3Ffrom%3D%257Bplace.id%257D%26to%3D%257Bplace.id%257D">Journey with coverage</a>
 				<a href="play.html?request=https%3A%2F%2Fapi.navitia.io%2Fv1%2Fcoverage%2F%257Bregion.id%257D%2Fjourneys%3Fto%3D%257Bplace.id%257D%26from%3D%257Bplace.id%257D%26datetime_represents%3Darrival%26datetime%3D%257Bdatetime%257D%26">Journey with arrival datetime</a>
 				<a href="play.html?request=https%3A%2F%2Fapi.navitia.io%2Fv1%2Fjourneys%3Ffrom%3D%257Bplace.id%257D%26to%3D%257Bplace.id%257D">Journey without coverage</a>
 			</div>
 
-			<div class="rubriques">	
-				<h3><img class="pictofeatures" src='img/departure.png'></h3>		
+			<div class="rubriques">
+				<h3><img class="pictofeatures" src='img/departure.png'></h3>
 				<a href="play.html?request=https%3A%2F%2Fapi.navitia.io%2Fv1%2Fcoverage%2F%257Bregion.id%257D%2Fstop_areas%2F%257Bstop_area.id%257D%2Fdepartures%3Ffrom_datetime%3D%257Bdatetime%257D%26">Departures at stop area</a>
 				<a href="play.html?request=https%3A%2F%2Fapi.navitia.io%2Fv1%2Fcoverage%2F%257Bregion.id%257D%2Fstop_areas%2F%257Bstop_area.id%257D%2Farrivals%3Ffrom_datetime%3D%257Bdatetime%257D%26">Arrivals at stop area</a>
 				<a href="play.html?request=https%3A%2F%2Fapi.navitia.io%2Fv1%2Fcoverage%2F%257Bregion.id%257D%2Fstop_areas%2F%257Bstop_area.id%257D%2Fstop_schedules%3Ffrom_datetime%3D%257Bdatetime%257D%26items_per_schedule%3D5%26">Stop schedules at stop area</a>
-			</div>		
+			</div>
 
-			<div class="rubriques">	
+			<div class="rubriques">
 				<h3><img class="pictofeatures" src='img/route_schedules.png'></h3>
 				<a href="play.html?request=https%3A%2F%2Fapi.navitia.io%2Fv1%2Fcoverage%2F%257Bregion.id%257D%2Froutes%2F%257Broute.id%257D%2Froute_schedules%3Ffrom_datetime%3D%257Bdatetime%257D%26items_per_schedule%3D25%26">Route schedules for route</a>
 				<a href="play.html?request=https%3A%2F%2Fapi.navitia.io%2Fv1%2Fcoverage%2F%257Bregion.id%257D%2Flines%2F%257Bline.id%257D%2Froute_schedules%3Ffrom_datetime%3D%257Bdatetime%257D%26items_per_schedule%3D25%26">Route schedules for line</a>
@@ -54,13 +54,13 @@
 				<a href="play.html?request=https%3A%2F%2Fapi.navitia.io%2Fv1%2Fcoverage%2F%257Bregion.id%257D%2Fplaces%3Fq%3D%257Btext%257D%26type%255B%255D%3Dstop_area%26">Auto complete only on stop area</a>
 			</div>
 
-			<div class="rubriques">	
+			<div class="rubriques">
 				<h3><img class="pictofeatures" src='img/find.png'></h3>
 				<a href="play.html?request=https%3A%2F%2Fapi.navitia.io%2Fv1%2Fcoord%2F%257Blon%253Blat%257D%2Fplaces_nearby%3F">Find places nearby</a>
 				<a href="play.html?request=https%3A%2F%2Fapi.navitia.io%2Fv1%2Fcoverage%2F%257Bregion.id%257D%2Fcoord%2F%257Blon%253Blat%257D%2Fstop_areas%3Fdistance%3D500%26">Find stop areas nearby</a>
 			</div>
 
-			<div class="rubriques">	
+			<div class="rubriques">
 				<h3><img class="pictofeatures" src='img/isochrons.png'></h3>
                                 <a href="play.html?request=https%3A%2F%2Fapi.navitia.io%2Fv1%2Fcoverage%2F%257Bregion.id%257D%2Fisochrones%3Ffrom%3D%257Bplace.id%257D%26datetime%3D%257Bdatetime%257D%26boundary_duration%255B%255D%3D600%26boundary_duration%255B%255D%3D1200%26boundary_duration%255B%255D%3D1800%26boundary_duration%255B%255D%3D2400%26boundary_duration%255B%255D%3D3000%26boundary_duration%255B%255D%3D3600%26">Graphical isochrons with coverage</a>
                                 <a href="play.html?request=https%3A%2F%2Fapi.navitia.io%2Fv1%2Fcoverage%2F%257Bregion.id%257D%2Fheat_maps%3Ffrom%3D%257Bplace.id%257D%26datetime%3D%257Bdatetime%257D%26max_duration%3D3600%26resolution%3D200%26">Heat map with coverage</a>
@@ -77,7 +77,7 @@
 		           	<input id="urlinput" name="request" type="url" placeholder="Insert your url">
 		           	<button>go</button>
 		        </div>
-			</form> 
+			</form>
 				<p class="ou">or</p>
 				<div class="or">
 					<form action="play.html"><button>Start with playground</button></form>
@@ -90,7 +90,7 @@
 	</div><!-- raw -->
 
         <footer>
-          © 2019 <a href="http://navitia.io/">Kisio Digital</a>
+          © 2021 <a href="http://navitia.io/">Kisio Digital</a>
           − <a href="https://github.com/CanalTP/navitia-playground">Fork
             me on GitHub</a>
         </footer>
