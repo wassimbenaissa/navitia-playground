@@ -381,8 +381,10 @@ map.run = function(context, type, json) {
         svg.append('g')
             .attr('class', 'axis y');
 
+        // to make it responsive
         var draw_elevation = function (){
-
+            // It's impossible(?) to get the div's width, since it's not yet added to DOM...
+            // the default width is set to 1600 as a good guess...
             var width = div_elevation.width() || 1600;
 
             // Scale the range of the data
