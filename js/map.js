@@ -303,7 +303,6 @@ map.run = function(context, type, json) {
 
     // Draw elevations
     if (type==='section' && json.elevations) {
-
         var div_elevation = $('<div/>');
         div_elevation.addClass('elevation');
         div.append(div_elevation);
@@ -322,7 +321,8 @@ map.run = function(context, type, json) {
 
         // Scale the range of the data
         xScale.domain(d3.extent(data, function(d) { return d.distance_from_start;}));
-        yScale.domain([0, d3.max(data, function(d) { return d.elevation; }) * 1.2]);
+        yScale.domain([d3.min(data, function(d) { return d.elevation; }) / 1.2,
+            d3.max(data, function(d) { return d.elevation; }) * 1.2]);
 
         var valueline = d3.line()
             .x(function(d) { return xScale(d.distance_from_start); })
@@ -332,7 +332,7 @@ map.run = function(context, type, json) {
         var yAxis = d3.axisLeft(yScale);
 
         var xGrid = xAxis.ticks(5).tickFormat('');
-        var yGrid = yAxis.ticks(5).tickFormat('');
+        var yGrid = yAxis.ticks(5).tickFormat('').tickSize(-1000);
 
         // add the X gridlines
         svg.append('g')
@@ -365,8 +365,7 @@ map.run = function(context, type, json) {
 
             // Scale the range of the data
             xScale.domain(d3.extent(data, function(d) { return d.distance_from_start;}));
-            yScale.domain([d3.min(data, function(d) { return d.elevation; }) / 1.2,
-                           d3.max(data, function(d) { return d.elevation; }) * 1.2]);
+
 
             xScale.range([0, width]);
 
@@ -378,6 +377,7 @@ map.run = function(context, type, json) {
             svg.select('.grid.y')
                 .call(yGrid);
 
+            xAxis.scale(xScale);
             svg.select('.axis.x')
                 .attr('transform', 'translate(5, 100)')
                 .call(d3.axisBottom(xScale));
