@@ -31,16 +31,11 @@
 .elevation_line {
   fill: none;
   stroke: steelblue;
-  background: $dark-gray;
   stroke-width: 2px;
 }
 
-.elevation_grid line {
+.grid line {
   stroke: lightgrey;
   stroke-opacity: 0.7;
   shape-rendering: crispEdges;
-}
-
-.elevation_grid path {
-  stroke-width: 0;
 }

@@ -310,71 +310,90 @@ map.run = function(context, type, json) {
 
         var data = json.elevations;
 
-        var resize = function (){
-            //alert(div_elevation.width());
-        };
-
         var svg = d3.select(div_elevation.get(0)).append('svg')
-            .style('width', '100%')
-            .append('g').attr('transform', 'translate(20, 10)');
+            .style('width',  '100%')
+            .append('g')
+            .attr('transform', 'translate(20, 20)');
 
         // define the line
         // set the ranges
-        var xScale = d3.scaleLinear().range([0, 800]);
+        var xScale = d3.scaleLinear().range([0, 1000]);
         var yScale = d3.scaleLinear().range([100, 0]);
-
-        var valueline = d3.line()
-            .x(function(d) { return xScale(d.distance_from_start); })
-            .y(function(d) { return yScale(d.elevation); });
-
-        var make_x_gridlines = function () {
-            return d3.axisBottom(xScale).ticks(5);
-        };
-
-        // gridlines in y axis function
-        var make_y_gridlines = function () {
-            return d3.axisLeft(yScale).ticks(5);
-        };
 
         // Scale the range of the data
         xScale.domain(d3.extent(data, function(d) { return d.distance_from_start;}));
         yScale.domain([0, d3.max(data, function(d) { return d.elevation; }) * 1.2]);
 
+        var valueline = d3.line()
+            .x(function(d) { return xScale(d.distance_from_start); })
+            .y(function(d) { return yScale(d.elevation); });
+
+        var xAxis = d3.axisBottom(xScale);
+        var yAxis = d3.axisLeft(yScale);
+
+        var xGrid = xAxis.ticks(5).tickFormat('');
+        var yGrid = yAxis.ticks(5).tickFormat('');
+
         // add the X gridlines
         svg.append('g')
-            .attr('class', 'elevation_grid')
-            .attr('transform', 'translate(5,' + 100 + ')')
-            .call(make_x_gridlines()
-                .tickSize(-100)
-                .tickFormat('')
-            );
+            .attr('class', 'grid x')
+            .attr('transform', 'translate(5, 100)');
 
         // add the Y gridlines
         svg.append('g')
-            .attr('class', 'elevation_grid')
-            .attr('transform', 'translate(5, 0)')
-            .call(make_y_gridlines()
-                .tickSize(-800)
-                .tickFormat('')
-            );
+            .attr('class', 'grid y')
+            .attr('transform', 'translate(5, 0)');
 
         // add the valueline path.
         svg.append('path')
             .data([data])
             .attr('class', 'elevation_line')
-            .attr('d', valueline);
+            .attr('transform', 'translate(5,0)');
 
         // add the X Axis
         svg.append('g')
-            .attr('transform', 'translate(5,' + 100 + ')')
-            .call(d3.axisBottom(xScale));
+            .attr('class', 'axis x');
 
         // add the Y Axis
         svg.append('g')
-            .attr('transform', 'translate(' + 5  +',0)')
-            .call(d3.axisLeft(yScale));
+            .attr('class', 'axis y')
+            .text('Elevation');
+
+        var resize = function (){
+
+            var width = div_elevation.width() || 1600;
+
+            // Scale the range of the data
+            xScale.domain(d3.extent(data, function(d) { return d.distance_from_start;}));
+            yScale.domain([0, d3.max(data, function(d) { return d.elevation; }) * 1.2]);
+
+            xScale.range([0, width]);
+
+            xGrid.tickSize(-100);
+            svg.select('.grid.x')
+                .call(xGrid);
+
+            yGrid.tickSize(-width);
+            svg.select('.grid.y')
+                .call(yGrid);
+
+            svg.select('.axis.x')
+                .attr('transform', 'translate(5, 100)')
+                .call(d3.axisBottom(xScale));
+
+            svg.select('.axis.y')
+                .attr('transform', 'translate(5, 0)')
+                .call(d3.axisLeft(yScale));
+
+            valueline = d3.line()
+                .x(function(d) { return xScale(d.distance_from_start); })
+                .y(function(d) { return yScale(d.elevation); });
+
+            svg.selectAll('.elevation_line').attr('d', valueline);
+        };
 
         d3.select(window).on('resize', resize);
+        resize();
     }
     if ((features = map.getFeatures(context, type, json)).length) {
         var div_map = map.createMap(function(m) {
