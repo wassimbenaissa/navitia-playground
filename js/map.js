@@ -307,17 +307,40 @@ map.run = function(context, type, json) {
         div_elevation.addClass('elevation');
         div.append(div_elevation);
 
+        var height = 100;
+        var margin =  5;
+
         var data = json.elevations;
 
         var svg = d3.select(div_elevation.get(0)).append('svg')
-            .style('width',  '100%')
+            .attr('class', 'elevation-svg')
             .append('g')
             .attr('transform', 'translate(20, 20)');
+
+        svg.append('text')
+            .attr('class', 'elevation-title')
+            .style('font-weight', 'bold')
+            .style('text-anchor', 'center')
+            .attr('x', '50%')
+            .attr('y', 0)
+            .text('Elevation Graph');
+
+        svg.append('text')
+            .attr('class', 'elevation-label')
+            .attr('x', 10)
+            .attr('y', 140)
+            .text('Distance from start (m)');
+
+        svg.append('text')
+            .attr('class', 'elevation-label')
+            .attr('x', 10)
+            .attr('y', 0)
+            .text('Height (m)');
 
         // define the line
         // set the ranges
         var xScale = d3.scaleLinear().range([0, 1000]);
-        var yScale = d3.scaleLinear().range([100, 0]);
+        var yScale = d3.scaleLinear().range([height, 0]);
 
         // Scale the range of the data
         xScale.domain(d3.extent(data, function(d) { return d.distance_from_start;}));
@@ -332,23 +355,23 @@ map.run = function(context, type, json) {
         var yAxis = d3.axisLeft(yScale);
 
         var xGrid = xAxis.ticks(5).tickFormat('');
-        var yGrid = yAxis.ticks(5).tickFormat('').tickSize(-1000);
+        var yGrid = yAxis.ticks(5).tickFormat('');
 
         // add the X gridlines
         svg.append('g')
             .attr('class', 'grid x')
-            .attr('transform', 'translate(5, 100)');
+            .attr('transform', sprintf('translate(%s, %s)', margin, height));
 
         // add the Y gridlines
         svg.append('g')
             .attr('class', 'grid y')
-            .attr('transform', 'translate(5, 0)');
+            .attr('transform', sprintf('translate(%s, 0)', margin));
 
         // add the valueline path.
         svg.append('path')
             .data([data])
-            .attr('class', 'elevation_line')
-            .attr('transform', 'translate(5,0)');
+            .attr('class', 'elevation-line')
+            .attr('transform', sprintf('translate(%s, 0)', margin));
 
         // add the X Axis
         svg.append('g')
@@ -356,8 +379,7 @@ map.run = function(context, type, json) {
 
         // add the Y Axis
         svg.append('g')
-            .attr('class', 'axis y')
-            .text('Elevation');
+            .attr('class', 'axis y');
 
         var draw_elevation = function (){
 
@@ -365,32 +387,29 @@ map.run = function(context, type, json) {
 
             // Scale the range of the data
             xScale.domain(d3.extent(data, function(d) { return d.distance_from_start;}));
+            xScale.range([0, width - 50]);
 
-
-            xScale.range([0, width]);
-
-            xGrid.tickSize(-100);
+            xGrid.tickSize(-height);
             svg.select('.grid.x')
                 .call(xGrid);
 
-            yGrid.tickSize(-width);
+            yGrid.tickSize(-(width - 50));
             svg.select('.grid.y')
                 .call(yGrid);
 
-            xAxis.scale(xScale);
             svg.select('.axis.x')
-                .attr('transform', 'translate(5, 100)')
+                .attr('transform', sprintf('translate(%s, %s)', margin, height))
                 .call(d3.axisBottom(xScale));
 
             svg.select('.axis.y')
-                .attr('transform', 'translate(5, 0)')
+                .attr('transform', sprintf('translate(%s, 0)', margin))
                 .call(d3.axisLeft(yScale));
 
             valueline = d3.line()
                 .x(function(d) { return xScale(d.distance_from_start); })
                 .y(function(d) { return yScale(d.elevation); });
 
-            svg.selectAll('.elevation_line').attr('d', valueline);
+            svg.selectAll('.elevation-line').attr('d', valueline);
         };
 
         d3.select(window).on('resize', draw_elevation);

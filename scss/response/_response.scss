@@ -21,14 +21,14 @@
     background-image: url(../lib/img/leaflet/dist/images/layers-2x.png);
 }
 
-.elevation {
-  //background: $dark-gray;
+.elevation-svg {
+  background: white;
   width: 100%;
-  height: 150px;
+  height: 180px;
   margin: 0.5em 0 0 0;
 }
 
-.elevation_line {
+.elevation-line {
   fill: none;
   stroke: steelblue;
   stroke-width: 2px;
@@ -44,4 +44,6 @@
   stroke-width: 0;
 }
 
-
+.axis text {
+  font: 10px sans-serif;
+}
