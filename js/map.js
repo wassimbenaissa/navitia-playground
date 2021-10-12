@@ -359,13 +359,14 @@ map.run = function(context, type, json) {
             .attr('class', 'axis y')
             .text('Elevation');
 
-        var resize = function (){
+        var draw_elevation = function (){
 
             var width = div_elevation.width() || 1600;
 
             // Scale the range of the data
             xScale.domain(d3.extent(data, function(d) { return d.distance_from_start;}));
-            yScale.domain([0, d3.max(data, function(d) { return d.elevation; }) * 1.2]);
+            yScale.domain([d3.min(data, function(d) { return d.elevation; }) / 1.2,
+                           d3.max(data, function(d) { return d.elevation; }) * 1.2]);
 
             xScale.range([0, width]);
 
@@ -392,8 +393,8 @@ map.run = function(context, type, json) {
             svg.selectAll('.elevation_line').attr('d', valueline);
         };
 
-        d3.select(window).on('resize', resize);
-        resize();
+        d3.select(window).on('resize', draw_elevation);
+        draw_elevation();
     }
     if ((features = map.getFeatures(context, type, json)).length) {
         var div_map = map.createMap(function(m) {
