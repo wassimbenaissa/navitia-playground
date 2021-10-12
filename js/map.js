@@ -1,7 +1,7 @@
 // Copyright (c) 2016 CanalTP
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
+// of this software and associated documentation files (the 'Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
@@ -25,6 +25,7 @@ var response;
 var storage;
 var summary;
 var utils;
+var d3;
 
 var map = {};
 
@@ -255,6 +256,7 @@ map._getDefaultLayerName = function() {
 
 map.createMap = function(handle) {
     var div = $('<div/>');
+
     // setting for default path of images used by leaflet
     L.Icon.Default.imagePath = 'lib/img/leaflet/dist/images/';
     div.addClass('leaflet');
@@ -297,15 +299,94 @@ map.createMap = function(handle) {
 
 map.run = function(context, type, json) {
     var features = [];
+    var div = $('<div/>');
+
+    // Draw elevations
+    if (type==='section' && json.elevations) {
+
+        var div_elevation = $('<div/>');
+        div_elevation.addClass('elevation');
+        div.append(div_elevation);
+
+        var data = json.elevations;
+
+        var resize = function (){
+            //alert(div_elevation.width());
+        };
+
+        var svg = d3.select(div_elevation.get(0)).append('svg')
+            .style('width', '100%')
+            .append('g').attr('transform', 'translate(20, 10)');
+
+        // define the line
+        // set the ranges
+        var xScale = d3.scaleLinear().range([0, 800]);
+        var yScale = d3.scaleLinear().range([100, 0]);
+
+        var valueline = d3.line()
+            .x(function(d) { return xScale(d.distance_from_start); })
+            .y(function(d) { return yScale(d.elevation); });
+
+        var make_x_gridlines = function () {
+            return d3.axisBottom(xScale).ticks(5);
+        };
+
+        // gridlines in y axis function
+        var make_y_gridlines = function () {
+            return d3.axisLeft(yScale).ticks(5);
+        };
+
+        // Scale the range of the data
+        xScale.domain(d3.extent(data, function(d) { return d.distance_from_start;}));
+        yScale.domain([0, d3.max(data, function(d) { return d.elevation; }) * 1.2]);
+
+        // add the X gridlines
+        svg.append('g')
+            .attr('class', 'elevation_grid')
+            .attr('transform', 'translate(5,' + 100 + ')')
+            .call(make_x_gridlines()
+                .tickSize(-100)
+                .tickFormat('')
+            );
+
+        // add the Y gridlines
+        svg.append('g')
+            .attr('class', 'elevation_grid')
+            .attr('transform', 'translate(5, 0)')
+            .call(make_y_gridlines()
+                .tickSize(-800)
+                .tickFormat('')
+            );
+
+        // add the valueline path.
+        svg.append('path')
+            .data([data])
+            .attr('class', 'elevation_line')
+            .attr('d', valueline);
+
+        // add the X Axis
+        svg.append('g')
+            .attr('transform', 'translate(5,' + 100 + ')')
+            .call(d3.axisBottom(xScale));
+
+        // add the Y Axis
+        svg.append('g')
+            .attr('transform', 'translate(' + 5  +',0)')
+            .call(d3.axisLeft(yScale));
+
+        d3.select(window).on('resize', resize);
+    }
     if ((features = map.getFeatures(context, type, json)).length) {
-        return map.createMap(function(m) {
+        var div_map = map.createMap(function(m) {
             return L.featureGroup(features).addTo(m).getBounds();
         });
-    } else {
-        var div = $('<div/>');
-        div.addClass('noMap');
-        div.append('No map');
+        div.append(div_map);
         return div;
+    } else {
+        var div_nomap = $('<div/>');
+        div_nomap.addClass('noMap');
+        div_nomap.append('No map');
+        return div_nomap;
     }
 };
 
