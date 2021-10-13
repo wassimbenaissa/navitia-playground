@@ -140,6 +140,9 @@ extended.make.section = function(context, json) {
     if (json.path) {
         result.append(response.render(context, json, 'path', 'path'));
     }
+    if (json.elevations) {
+        result.append(response.render(context, json, 'elevations', 'elevations'));
+    }
     (json.ridesharing_journeys || []).forEach(function(j, i) {
         result.append(response.render(context, j, 'journey', 'ridesharing_journeys', i));
     });

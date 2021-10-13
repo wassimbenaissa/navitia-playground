@@ -804,6 +804,50 @@ summary.make.note = function(context, json) {
     return json.value;
 };
 
+summary.make.elevations = function(context, json) {
+    /*
+    0%: A flat road
+    1-3%: Slightly uphill but not particularly challenging. A bit like riding into the wind.
+    4-6%: A manageable gradient that can cause fatigue over long periods.
+    7-9%: Starting to become uncomfortable for seasoned riders, and very challenging for new climbers.
+    10%-15%: A painful gradient, especially if maintained for any length of time
+    16%+: Very challenging for riders of all abilities. Maintaining this sort of incline for any length of time is very painful.
+    */
+
+    // we consider a slope is steep if the angle is larger than 5° ~= 10.45%
+    var going_up = 0;
+    var going_down = 0;
+
+    var steep_ascending_slope = 0;
+    var steep_descending_slope = 0;
+
+    var steep_threshold = Math.sin(5.0 * Math.PI / 180.0);
+
+    json.elevations.forEach(function(element, index, array) {
+        if (index === 0) {
+            return;
+        }
+        var ele_diff = array[index].elevation - array[index-1].elevation;
+        var dis = array[index].distance_from_start - array[index-1].distance_from_start;
+
+        if (ele_diff > 0) {
+            going_up += ele_diff;
+            if ((ele_diff / parseFloat(dis)) > steep_threshold) {
+                steep_ascending_slope += dis;
+            }
+        }
+        if (ele_diff < 0) {
+            going_down += -ele_diff;
+            if (((-ele_diff) / parseFloat(dis)) > steep_threshold) {
+                steep_descending_slope += dis;
+            }
+        }
+
+    });
+    return sprintf('Elevation Climbed: %sm, Elevation Dropped: %sm, Steep Ascending: %sm, Steep Descending: %sm ',
+        going_up, going_down, steep_ascending_slope, steep_descending_slope);
+};
+
 summary.make.context = function(context, json) {
     var res = $('<span>').text(sprintf('current datetime: %s, timezone: %s',
                                        summary.formatDatetime(json.current_datetime),

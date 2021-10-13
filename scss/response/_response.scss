@@ -20,3 +20,30 @@
 .leaflet-retina .leaflet-control-layers-toggle {
     background-image: url(../lib/img/leaflet/dist/images/layers-2x.png);
 }
+
+.elevation-svg {
+  background: white;
+  width: 100%;
+  height: 180px;
+  margin: 0.5em 0 0 0;
+}
+
+.elevation-line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+.grid line {
+  stroke: lightgrey;
+  stroke-opacity: 0.7;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}

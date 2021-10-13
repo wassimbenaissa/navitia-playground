@@ -25,6 +25,7 @@ var response;
 var storage;
 var summary;
 var utils;
+var d3;
 
 var map = {};
 
@@ -181,11 +182,15 @@ map.makeFeatures = {
             return map.makeFeatures[type](context, s);
         };
         return utils.flatMap(json[key].slice().reverse(), bind);
+    },
+    // TODO: implement when geojson_index is available
+    elevations: function() {
+        return [];
     }
 };
 
 map.hasMap = function(context, type, json) {
-    return map.getFeatures(context, type, json).length !== 0;
+    return map.getFeatures(context, type, json).length !== 0 || map.makeElevationGraph[type] instanceof Function;
 };
 
 map.getFeatures = function(context, type, json) {
@@ -255,6 +260,7 @@ map._getDefaultLayerName = function() {
 
 map.createMap = function(handle) {
     var div = $('<div/>');
+
     // setting for default path of images used by leaflet
     L.Icon.Default.imagePath = 'lib/img/leaflet/dist/images/';
     div.addClass('leaflet');
@@ -295,17 +301,159 @@ map.createMap = function(handle) {
     return div;
 };
 
+map.makeElevationGraph = {};
+
+map.makeElevationGraph.elevations = function(context, json) {
+        var data = json.elevations;
+
+        if (!data) {
+            return;
+        }
+
+        var div_elevation = $('<div/>');
+        div_elevation.addClass('elevation');
+
+        var height = 100;
+        var margin =  10;
+
+        var svg = d3.select(div_elevation.get(0)).append('svg')
+            .attr('class', 'elevation-svg')
+            .append('g')
+            .attr('transform', 'translate(20, 20)');
+
+        svg.append('text')
+            .attr('class', 'elevation-title')
+            .style('font-weight', 'bold')
+            .style('text-anchor', 'center')
+            .attr('x', '50%')
+            .attr('y', 0)
+            .text('Elevation Graph');
+
+        svg.append('text')
+            .attr('class', 'elevation-label')
+            .attr('x', 10)
+            .attr('y', 140)
+            .text('Distance from start (m)');
+
+        svg.append('text')
+            .attr('class', 'elevation-label')
+            .attr('x', 10)
+            .attr('y', 0)
+            .text('Height (m)');
+
+        // define the line
+        // set the ranges
+        var xScale = d3.scaleLinear().range([0, 1000]);
+        var yScale = d3.scaleLinear().range([height, 0]);
+
+        // Scale the range of the data
+        xScale.domain(d3.extent(data, function(d) { return d.distance_from_start;}));
+        yScale.domain([d3.min(data, function(d) { return d.elevation; }) / 1.2,
+            d3.max(data, function(d) { return d.elevation; }) * 1.2]);
+        
+
+        var xAxis = d3.axisBottom(xScale);
+        var yAxis = d3.axisLeft(yScale);
+
+        var xGrid = xAxis.ticks(5).tickFormat('');
+        var yGrid = yAxis.ticks(5).tickFormat('');
+
+        // add the X gridlines
+        svg.append('g')
+            .attr('class', 'grid x')
+            .attr('transform', sprintf('translate(%s, %s)', margin, height));
+
+        // add the Y gridlines
+        svg.append('g')
+            .attr('class', 'grid y')
+            .attr('transform', sprintf('translate(%s, 0)', margin));
+
+        // add the valueline path.
+        svg.append('path')
+            .data([data])
+            .attr('class', 'elevation-line')
+            .attr('transform', sprintf('translate(%s, 0)', margin));
+
+        // add the X Axis
+        svg.append('g')
+            .attr('class', 'axis x');
+
+        // add the Y Axis
+        svg.append('g')
+            .attr('class', 'axis y');
+
+        // to make it responsive
+        var draw_elevation = function (){
+            // It's impossible(?) to get the div's width, since it's not yet added to DOM...
+            // the default width is set to 1600 as a good guess...
+            var width = div_elevation.width() || 1600;
+
+            // Scale the range of the data
+            xScale.domain(d3.extent(data, function(d) { return d.distance_from_start;}));
+            xScale.range([0, width - 50]);
+
+            xGrid.tickSize(-height);
+            svg.select('.grid.x')
+                .call(xGrid);
+
+            yGrid.tickSize(-(width - 50));
+            svg.select('.grid.y')
+                .call(yGrid);
+
+            svg.select('.axis.x')
+                .attr('transform', sprintf('translate(%s, %s)', margin, height))
+                .call(d3.axisBottom(xScale));
+
+            svg.select('.axis.y')
+                .attr('transform', sprintf('translate(%s, 0)', margin))
+                .call(d3.axisLeft(yScale));
+
+            var valueline = d3.line()
+                .x(function(d) { return xScale(d.distance_from_start); })
+                .y(function(d) { return yScale(d.elevation); });
+
+            svg.selectAll('.elevation-line').attr('d', valueline);
+        };
+
+        d3.select(window).on('resize', draw_elevation);
+        draw_elevation();
+        return div_elevation;
+};
+
+map.getElevationGraph = function(context, type, json) {
+    if (! (map.makeElevationGraph[type] instanceof Function)) { return; }
+    if (! (json instanceof Object)) { return; }
+    try {
+        return map.makeElevationGraph[type](context, json);
+    } catch (e) {
+        console.log(sprintf('map.makeFeatures[%s] thows an exception:', type));// jshint ignore:line
+        console.log(e);// jshint ignore:line
+    }
+};
+
 map.run = function(context, type, json) {
     var features = [];
+    var div_elevation;
+    var div = $('<div/>');
+
+    // Draw elevations
+    if ((div_elevation = map.getElevationGraph(context, type, json))) {
+        div.append(div_elevation);
+        // TODO: remove return once geojson_index is available
+        return div;
+    }
+
     if ((features = map.getFeatures(context, type, json)).length) {
-        return map.createMap(function(m) {
+        var div_map = map.createMap(function(m) {
             return L.featureGroup(features).addTo(m).getBounds();
         });
-    } else {
-        var div = $('<div/>');
-        div.addClass('noMap');
-        div.append('No map');
+        div.append(div_map);
         return div;
+    } else {
+        var div_nomap = $('<div/>');
+        div_nomap.addClass('noMap');
+        div_nomap.append('No map');
+        return div_nomap;
     }
 };
 
