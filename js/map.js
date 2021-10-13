@@ -183,8 +183,8 @@ map.makeFeatures = {
         };
         return utils.flatMap(json[key].slice().reverse(), bind);
     },
-    // TODO: when geojson_index is available
-    elevations: function(context, json) {
+    // TODO: implement when geojson_index is available
+    elevations: function() {
         return [];
     }
 };
