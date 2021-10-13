@@ -814,31 +814,31 @@ summary.make.elevations = function(context, json) {
     16%+: Very challenging for riders of all abilities. Maintaining this sort of incline for any length of time is very painful.
     */
 
-    // we consider a slope is steep if the angle is larger than 6° ~= 10.45%
+    // we consider a slope is steep if the angle is larger than 5° ~= 10.45%
     var going_up = 0;
     var going_down = 0;
 
     var steep_ascending_slope = 0;
     var steep_descending_slope = 0;
 
-    var dis;
-    var steep_threshold = Math.sin(6.0 * Math.PI / 180.0);
+    var steep_threshold = Math.sin(5.0 * Math.PI / 180.0);
 
     json.elevations.forEach(function(element, index, array) {
         if (index === 0) {
             return;
         }
-        if (array[index].elevation > array[index-1].elevation) {
-            going_up += array[index].elevation - array[index-1].elevation;
-            dis = array[index].distance_from_start - array[index-1].distance_from_start;
-            if ( (going_up / parseFloat(dis)) > steep_threshold) {
+        var ele_diff = array[index].elevation - array[index-1].elevation;
+        var dis = array[index].distance_from_start - array[index-1].distance_from_start;
+
+        if (ele_diff > 0) {
+            going_up += ele_diff;
+            if ((ele_diff / parseFloat(dis)) > steep_threshold) {
                 steep_ascending_slope += dis;
             }
         }
-        if (array[index].elevation < array[index-1].elevation) {
-            going_down += array[index-1].elevation - array[index].elevation;
-            dis = array[index].distance_from_start - array[index-1].distance_from_start;
-            if ( (going_down / parseFloat(dis)) > steep_threshold) {
+        if (ele_diff < 0) {
+            going_down += -ele_diff;
+            if (((-ele_diff) / parseFloat(dis)) > steep_threshold) {
                 steep_descending_slope += dis;
             }
         }
