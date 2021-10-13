@@ -844,7 +844,7 @@ summary.make.elevations = function(context, json) {
         }
 
     });
-    return sprintf('Elevation Climbed: %sm, Elevation Droped: %sm, Steep ascending: %sm, Steep descending: %sm ',
+    return sprintf('Elevation Climbed: %sm, Elevation Dropped: %sm, Steep Ascending: %sm, Steep Descending: %sm ',
         going_up, going_down, steep_ascending_slope, steep_descending_slope);
 };
 
