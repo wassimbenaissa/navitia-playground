@@ -297,20 +297,19 @@ map.createMap = function(handle) {
     return div;
 };
 
-map.run = function(context, type, json) {
-    var features = [];
-    var div = $('<div/>');
+map.makeElevationGraph = {
+    section: function(context, json) {
+        var data = json.elevations;
 
-    // Draw elevations
-    if (type==='section' && json.elevations) {
+        if (!data) {
+            return;
+        }
+
         var div_elevation = $('<div/>');
         div_elevation.addClass('elevation');
-        div.append(div_elevation);
 
         var height = 100;
         var margin =  5;
-
-        var data = json.elevations;
 
         var svg = d3.select(div_elevation.get(0)).append('svg')
             .attr('class', 'elevation-svg')
@@ -346,10 +345,7 @@ map.run = function(context, type, json) {
         xScale.domain(d3.extent(data, function(d) { return d.distance_from_start;}));
         yScale.domain([d3.min(data, function(d) { return d.elevation; }) / 1.2,
             d3.max(data, function(d) { return d.elevation; }) * 1.2]);
-
-        var valueline = d3.line()
-            .x(function(d) { return xScale(d.distance_from_start); })
-            .y(function(d) { return yScale(d.elevation); });
+        
 
         var xAxis = d3.axisBottom(xScale);
         var yAxis = d3.axisLeft(yScale);
@@ -407,7 +403,7 @@ map.run = function(context, type, json) {
                 .attr('transform', sprintf('translate(%s, 0)', margin))
                 .call(d3.axisLeft(yScale));
 
-            valueline = d3.line()
+            var valueline = d3.line()
                 .x(function(d) { return xScale(d.distance_from_start); })
                 .y(function(d) { return yScale(d.elevation); });
 
@@ -416,8 +412,32 @@ map.run = function(context, type, json) {
 
         d3.select(window).on('resize', draw_elevation);
         draw_elevation();
+        return div_elevation;
+    }
+};
+
+map.getElevatoinGraph = function(context, type, json) {
+    if (! (map.makeElevationGraph[type] instanceof Function)) { return; }
+    if (! (json instanceof Object)) { return; }
+    try {
+        return map.makeElevationGraph[type](context, json);
+    } catch (e) {
+        console.log(sprintf('map.makeFeatures[%s] thows an exception:', type));// jshint ignore:line
+        console.log(e);// jshint ignore:line
+    }
+};
+
+map.run = function(context, type, json) {
+    var features = [];
+    var div = $('<div/>');
+
+    // Draw elevations
+    var div_elevation;
+    if ((div_elevation = map.getElevatoinGraph(context, type, json))) {
+        div.append(div_elevation);
     }
     if ((features = map.getFeatures(context, type, json)).length) {
+
         var div_map = map.createMap(function(m) {
             return L.featureGroup(features).addTo(m).getBounds();
         });
