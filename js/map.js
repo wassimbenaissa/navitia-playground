@@ -182,11 +182,15 @@ map.makeFeatures = {
             return map.makeFeatures[type](context, s);
         };
         return utils.flatMap(json[key].slice().reverse(), bind);
+    },
+    // TODO: when geojson_index is available
+    elevations: function(context, json) {
+        return [];
     }
 };
 
 map.hasMap = function(context, type, json) {
-    return map.getFeatures(context, type, json).length !== 0;
+    return map.getFeatures(context, type, json).length !== 0 || map.makeElevationGraph[type] instanceof Function;
 };
 
 map.getFeatures = function(context, type, json) {
@@ -297,8 +301,9 @@ map.createMap = function(handle) {
     return div;
 };
 
-map.makeElevationGraph = {
-    section: function(context, json) {
+map.makeElevationGraph = {};
+
+map.makeElevationGraph.elevations = function(context, json) {
         var data = json.elevations;
 
         if (!data) {
@@ -309,7 +314,7 @@ map.makeElevationGraph = {
         div_elevation.addClass('elevation');
 
         var height = 100;
-        var margin =  5;
+        var margin =  10;
 
         var svg = d3.select(div_elevation.get(0)).append('svg')
             .attr('class', 'elevation-svg')
@@ -413,7 +418,6 @@ map.makeElevationGraph = {
         d3.select(window).on('resize', draw_elevation);
         draw_elevation();
         return div_elevation;
-    }
 };
 
 map.getElevatoinGraph = function(context, type, json) {
@@ -429,15 +433,17 @@ map.getElevatoinGraph = function(context, type, json) {
 
 map.run = function(context, type, json) {
     var features = [];
+    var div_elevation;
     var div = $('<div/>');
 
     // Draw elevations
-    var div_elevation;
     if ((div_elevation = map.getElevatoinGraph(context, type, json))) {
         div.append(div_elevation);
+        // TODO: remove return once geojson_index is available
+        return div;
     }
-    if ((features = map.getFeatures(context, type, json)).length) {
 
+    if ((features = map.getFeatures(context, type, json)).length) {
         var div_map = map.createMap(function(m) {
             return L.featureGroup(features).addTo(m).getBounds();
         });
