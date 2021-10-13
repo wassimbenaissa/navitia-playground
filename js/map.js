@@ -420,7 +420,7 @@ map.makeElevationGraph.elevations = function(context, json) {
         return div_elevation;
 };
 
-map.getElevatoinGraph = function(context, type, json) {
+map.getElevationGraph = function(context, type, json) {
     if (! (map.makeElevationGraph[type] instanceof Function)) { return; }
     if (! (json instanceof Object)) { return; }
     try {
@@ -437,7 +437,7 @@ map.run = function(context, type, json) {
     var div = $('<div/>');
 
     // Draw elevations
-    if ((div_elevation = map.getElevatoinGraph(context, type, json))) {
+    if ((div_elevation = map.getElevationGraph(context, type, json))) {
         div.append(div_elevation);
         // TODO: remove return once geojson_index is available
         return div;
