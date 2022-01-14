@@ -462,31 +462,26 @@ map.run = function(context, type, json) {
 
 map._makeMarkerForAccessPoint = function(context, sp) {
     var ap_markers = [];
-    var lat, lon;
-    console.log(sp);
-    if ("access_points" in sp) {
-        for(let ap of sp.access_points) {
-            console.log(ap);
+    if ('access_points' in sp) {
+        sp.access_points.forEach(function(ap) {
             var obj = ap;
-            lat = ap.coord.lat;
-            lon = ap.coord.lon;
             var type = 'access_point';
             var sum = summary.run(context, type, ap);
             var marker;
-            marker = L.marker([lat, lon]);
+            marker = L.marker([ap.coord.lat, ap.coord.lon]);
             var style1 = {};
             style1.color = 'gray';
             style1.weight = 3;
             style1.opacity = 1;
             var connection = [{
-                "type": "LineString",
-                "coordinates": [[sp.coord.lon, sp.coord.lat], [lon, lat]]
+                'type': 'LineString',
+                'coordinates': [[sp.coord.lon, sp.coord.lat], [ap.coord.lon, ap.coord.lat]]
             }];
             ap_markers.push(L.geoJson(connection, { style: style1 }));
             ap_markers.push(marker.bindPopup(map._makeLink(context, type, obj, sum)[0]));
-        }
+
+        });
     }
-    console.log(ap_markers.length);
     return ap_markers;
 };
 
