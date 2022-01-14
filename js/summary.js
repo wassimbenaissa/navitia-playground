@@ -995,3 +995,40 @@ summary.run = function(context, type, json) {
     }
     return res;
 };
+
+summary.make.access_point = function(context, ap) {
+    var res = $('<span/>');
+    res.append('name: ');
+    if (ap.name) {
+        $('<span/>')
+            .addClass('street')
+            .text(ap.name)
+        .appendTo(res);
+    }
+    res.append(' - ');
+    res.append('properties (');
+    if (ap.is_entrance && ap.is_entrance === true) {
+        res.append('is entrance');
+    }
+    res.append(' - ');
+    if (ap.is_exit && ap.is_exit === true) {
+        res.append('is exit');
+    }
+    res.append(') - ');
+    res.append('length: ');
+    if (ap.length) {
+        $('<span/>')
+            .addClass('street')
+            .text(sprintf('%s m', ap.length))
+        .appendTo(res);
+    }
+    res.append(' - ');
+    res.append('traversal time: ');
+    if (ap.traversal_time) {
+        $('<span/>')
+            .addClass('street')
+            .text(sprintf('%s m', ap.length))
+        .appendTo(res);
+    }
+    return res;
+};

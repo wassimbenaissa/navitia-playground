@@ -220,6 +220,11 @@ extended.make.stop_point = function(context, json) {
     if (Array.isArray(json.equipments) && json.equipments.length) {
         result.append(response.render(context, json.equipments, 'equipments', 'equipments'));
     }
+    if (json.access_points) {
+        json.access_points.forEach(function(section, i) {
+            result.append(response.render(context, section, 'access_point', 'access_points', i));
+        });
+    }
     return result;
 };
 
