@@ -150,7 +150,7 @@ map.makeFeatures = {
         return map._makeMarker(context, 'stop_area', json);
     },
     stop_point: function(context, json) {
-        return map._makeMarker(context, 'stop_point', json);
+        return map._makeMarker(context, 'stop_point', json).concat(map._makeMarkerForAccessPoint(context, json));
     },
     place: function(context, json) {
         return map._makeMarker(context, 'place', json);
@@ -163,6 +163,9 @@ map.makeFeatures = {
     },
     free_floating: function(context, json) {
         return map._makeMarker(context, 'free_floating', json);
+    },
+    access_point: function(context, json) {
+        return map._makeMarker(context, 'access_point', json);
     },
     connection: function(context, json) {
         return utils.flatMap([json.origin, json.destination], function(json) {
@@ -455,6 +458,31 @@ map.run = function(context, type, json) {
         div_nomap.append('No map');
         return div_nomap;
     }
+};
+
+map._makeMarkerForAccessPoint = function(context, sp) {
+    var ap_markers = [];
+    if ('access_points' in sp) {
+        sp.access_points.forEach(function(ap) {
+            var obj = ap;
+            var type = 'access_point';
+            var sum = summary.run(context, type, ap);
+            var marker;
+            marker = L.marker([ap.coord.lat, ap.coord.lon]);
+            var style1 = {};
+            style1.color = 'gray';
+            style1.weight = 3;
+            style1.opacity = 1;
+            var connection = [{
+                'type': 'LineString',
+                'coordinates': [[sp.coord.lon, sp.coord.lat], [ap.coord.lon, ap.coord.lat]]
+            }];
+            ap_markers.push(L.geoJson(connection, { style: style1 }));
+            ap_markers.push(marker.bindPopup(map._makeLink(context, type, obj, sum)[0]));
+
+        });
+    }
+    return ap_markers;
 };
 
 map._makeMarker = function(context, type, json, style, label) {
