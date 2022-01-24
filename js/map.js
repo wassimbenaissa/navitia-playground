@@ -64,7 +64,7 @@ map.makeFeatures = {
             case 'bike': style = map.bikeStyle; break;
             case 'taxi': style = map.taxiStyle; break;
             case 'car': style = map.carStyle; break;
-            case 'car_no_park': style = map.carStyle; break;
+            case 'carnopark': style = map.carStyle; break;
             case 'walking': style = map.walkingStyle; break;
             case 'ridesharing': style = map.ridesharingStyle; break;
             }
