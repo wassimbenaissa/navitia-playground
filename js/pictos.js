@@ -96,7 +96,7 @@ pictos.makeSnPicto = function(mode) {
         img = 'Bike';
     } else if (mode.indexOf('bss') === 0) {
         img = 'BikeSharingService';
-    } else if (mode === 'car' || mode === 'park' || mode === 'leave_parking') {
+    } else if (mode === 'car' || mode === 'carnopark' || mode === 'park' || mode === 'leave_parking') {
         img = 'Car';
     } else if (mode === 'ridesharing') {
         img = 'RideSharing';
