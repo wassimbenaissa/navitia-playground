@@ -141,7 +141,10 @@ extended.make.section = function(context, json) {
         result.append(response.render(context, json, 'path', 'path'));
     }
     if (json.elevations) {
-        result.append(response.render(context, json, 'elevations', 'elevations'));
+        result.append(response.render(context, json.elevations, 'elevations', 'elevations'));
+    }
+    if (json.vias) {
+        result.append(response.render(context, json.vias, 'vias', 'vias'));
     }
     (json.ridesharing_journeys || []).forEach(function(j, i) {
         result.append(response.render(context, j, 'journey', 'ridesharing_journeys', i));
@@ -327,6 +330,14 @@ extended.make.path = function(context, json) {
     var res = extended.defaultExtended(context, 'paths', json);
     (json.path || []).forEach(function(obj, i) {
         res.append(response.render(context, obj, 'instruction', 'paths', i));
+    });
+    return res;
+};
+
+extended.make.vias = function(context, json) {
+    var res = $('<div/>');
+    (json || []).forEach(function(obj, i) {
+        res.append(response.render(context, obj, 'place', 'access_point', i));
     });
     return res;
 };

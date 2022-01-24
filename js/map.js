@@ -82,7 +82,7 @@ map.makeFeatures = {
         if (draw_section_option === undefined) {
             draw_section_option = map.DrawSectionOption.DRAWBOTH;
         }
-        return map._makeString(context, 'section', json, style)
+        return map._makeString(context, 'section', json, style).concat(map.makeFeatures.vias(context, json.vias || []))
             .concat(map._makeStopTimesMarker(context, json, style, draw_section_option));
     },
     line: function(context, json) {
@@ -166,13 +166,20 @@ map.makeFeatures = {
         return map._makeMarker(context, 'free_floating', json);
     },
     access_point: function(context, json) {
-        return map._makeMarker(context, 'access_point', json);
+        var icon = map._makeAccessPointIcon();
+        return map._makeMarker(context, 'access_point', json, null, null, icon);
     },
     connection: function(context, json) {
         return utils.flatMap([json.origin, json.destination], function(json) {
             return map._makeMarker(context, 'stop_point', json);
         });
     },
+    vias: function(context, json) {
+        var bind = function(ap) {
+            return map.makeFeatures.pt_object(context, ap);
+        };
+        return utils.flatMap(json, bind);
+        },
     response: function(context, json) {
         var key = response.responseCollectionName(json);
         if (key === null) {
@@ -308,7 +315,7 @@ map.createMap = function(handle) {
 map.makeElevationGraph = {};
 
 map.makeElevationGraph.elevations = function(context, json) {
-        var data = json.elevations;
+        var data = json;
 
         if (!data) {
             return;
@@ -463,30 +470,40 @@ map.run = function(context, type, json) {
 
 map._makeMarkerForAccessPoint = function(context, sp) {
     var ap_markers = [];
-    if ('access_points' in sp) {
-        sp.access_points.forEach(function(ap) {
-            var obj = ap;
-            var type = 'access_point';
-            var sum = summary.run(context, type, ap);
-            var marker;
-            marker = L.marker([ap.coord.lat, ap.coord.lon]);
-            var style1 = {};
-            style1.color = 'gray';
-            style1.weight = 3;
-            style1.opacity = 1;
-            var connection = [{
-                'type': 'LineString',
-                'coordinates': [[sp.coord.lon, sp.coord.lat], [ap.coord.lon, ap.coord.lat]]
-            }];
-            ap_markers.push(L.geoJson(connection, { style: style1 }));
-            ap_markers.push(marker.bindPopup(map._makeLink(context, type, obj, sum)[0]));
-
-        });
+    if (! sp.access_points){
+        return ap_markers;
     }
+    sp.access_points.forEach(function(ap) {
+        var obj = ap;
+        var type = 'access_point';
+        var sum = summary.run(context, type, ap);
+        var marker;
+        marker = L.marker([ap.coord.lat, ap.coord.lon]);
+        var style1 = {};
+        style1.color = 'gray';
+        style1.weight = 3;
+        style1.opacity = 1;
+        var connection = [{
+            'type': 'LineString',
+            'coordinates': [[sp.coord.lon, sp.coord.lat], [ap.coord.lon, ap.coord.lat]]
+        }];
+        ap_markers.push(L.geoJson(connection, { style: style1 }));
+        ap_markers.push(marker.bindPopup(map._makeLink(context, type, obj, sum)[0]));
+
+    });
     return ap_markers;
 };
 
-map._makeMarker = function(context, type, json, style, label) {
+map._makeAccessPointIcon = function() {
+    var greenIcon = L.icon({
+        iconUrl:      '../img/pictos/metro-marker.png',
+        iconSize:     [30, 38], // size of the icon
+        iconAnchor:   [10, 40], // point of the icon which will correspond to marker's location
+    });
+    return greenIcon;
+};
+
+map._makeMarker = function(context, type, json, style, label, icon) {
     var lat, lon;
     var obj = json;
     switch (type){
@@ -507,7 +524,11 @@ map._makeMarker = function(context, type, json, style, label) {
     var t = type === 'place' ? json.embedded_type : type;
     var marker;
     if (! style) {
-        marker = L.marker([lat, lon]);
+        if (icon) {
+            marker = L.marker([lat, lon], {icon: icon});
+        } else {
+            marker = L.marker([lat, lon]);
+        }
     } else {
         style = utils.deepClone(style || {});
         delete style.dashArray;
