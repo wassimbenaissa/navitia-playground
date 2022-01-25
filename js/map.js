@@ -83,6 +83,8 @@ map.makeFeatures = {
             draw_section_option = map.DrawSectionOption.DRAWBOTH;
         }
         return map._makeString(context, 'section', json, style)
+            .concat(map.makeFeatures.vias(context, json))
+            .concat(map._makeStringViaToPt(context,'section', json, map.crowFlyStyle))
             .concat(map._makeStopTimesMarker(context, json, style, draw_section_option));
     },
     line: function(context, json) {
@@ -166,12 +168,33 @@ map.makeFeatures = {
         return map._makeMarker(context, 'free_floating', json);
     },
     access_point: function(context, json) {
-        return map._makeMarker(context, 'access_point', json);
+        var icon = map._makeAccessPointIcon(json);
+        return map._makeMarker(context, 'access_point', json, null, null, icon);
     },
     connection: function(context, json) {
         return utils.flatMap([json.origin, json.destination], function(json) {
             return map._makeMarker(context, 'stop_point', json);
         });
+    },
+    vias: function(context, json) {
+        if (! json.vias) {
+            return [];
+        }
+        var draw_entrance = false;
+        var draw_exit = false;
+        if (json.path[json.path.length - 1].via_uri){
+            draw_entrance = true;
+        }
+        if (json.path[0].via_uri){
+            draw_exit = true;
+        }
+        var bind = function(ap) {
+            var new_ap = utils.deepClone(ap || {});
+            new_ap.access_point.draw_entrance = draw_entrance;
+            new_ap.access_point.draw_exit = draw_exit;
+            return map.makeFeatures.pt_object(context, new_ap);
+        };
+        return utils.flatMap(json.vias, bind);
     },
     response: function(context, json) {
         var key = response.responseCollectionName(json);
@@ -308,7 +331,7 @@ map.createMap = function(handle) {
 map.makeElevationGraph = {};
 
 map.makeElevationGraph.elevations = function(context, json) {
-        var data = json.elevations;
+        var data = json;
 
         if (!data) {
             return;
@@ -463,30 +486,53 @@ map.run = function(context, type, json) {
 
 map._makeMarkerForAccessPoint = function(context, sp) {
     var ap_markers = [];
-    if ('access_points' in sp) {
-        sp.access_points.forEach(function(ap) {
-            var obj = ap;
-            var type = 'access_point';
-            var sum = summary.run(context, type, ap);
-            var marker;
-            marker = L.marker([ap.coord.lat, ap.coord.lon]);
-            var style1 = {};
-            style1.color = 'gray';
-            style1.weight = 3;
-            style1.opacity = 1;
-            var connection = [{
-                'type': 'LineString',
-                'coordinates': [[sp.coord.lon, sp.coord.lat], [ap.coord.lon, ap.coord.lat]]
-            }];
-            ap_markers.push(L.geoJson(connection, { style: style1 }));
-            ap_markers.push(marker.bindPopup(map._makeLink(context, type, obj, sum)[0]));
-
-        });
+    if (! sp.access_points){
+        return ap_markers;
     }
+    sp.access_points.forEach(function(ap) {
+        var obj = ap;
+        var type = 'access_point';
+        var sum = summary.run(context, type, ap);
+        var marker;
+        marker = L.marker([ap.coord.lat, ap.coord.lon]);
+        var style1 = {};
+        style1.color = 'gray';
+        style1.weight = 3;
+        style1.opacity = 1;
+        var connection = [{
+            'type': 'LineString',
+            'coordinates': [[sp.coord.lon, sp.coord.lat], [ap.coord.lon, ap.coord.lat]]
+        }];
+        ap_markers.push(L.geoJson(connection, { style: style1 }));
+        ap_markers.push(marker.bindPopup(map._makeLink(context, type, obj, sum)[0]));
+
+    });
     return ap_markers;
 };
 
-map._makeMarker = function(context, type, json, style, label) {
+map._makeAccessPointIcon = function(json) {
+    var iconUrl;
+    if (json.draw_entrance && json.draw_exit) {
+        iconUrl = '../img/pictos/EntranceExitMarker.png';
+    } else if (json.draw_entrance) {
+        iconUrl = '../img/pictos/EntranceMarker.png';
+    } else if (json.draw_exit) {
+        iconUrl = '../img/pictos/ExitMarker.png';
+    } else if (json.is_entrance && json.is_exit) {
+        iconUrl = '../img/pictos/EntranceExitMarker.png';
+    } else if (json.is_entrance) {
+        iconUrl = '../img/pictos/EntranceMarker.png';
+    } else if (json.is_exit) {
+        iconUrl = '../img/pictos/ExitMarker.png';
+    }
+    return L.icon({
+        iconUrl:      iconUrl,
+        iconSize:     [38, 50],
+        iconAnchor:   [19, 50], // point of the icon which will correspond to marker's location
+    });
+};
+
+map._makeMarker = function(context, type, json, style, label, icon) {
     var lat, lon;
     var obj = json;
     switch (type){
@@ -507,7 +553,11 @@ map._makeMarker = function(context, type, json, style, label) {
     var t = type === 'place' ? json.embedded_type : type;
     var marker;
     if (! style) {
-        marker = L.marker([lat, lon]);
+        if (icon) {
+            marker = L.marker([lat, lon], {icon: icon});
+        } else {
+            marker = L.marker([lat, lon]);
+        }
     } else {
         style = utils.deepClone(style || {});
         delete style.dashArray;
@@ -536,6 +586,41 @@ map._getCoordFromPlace = function(place) {
         return place[place.embedded_type].coord;
     }
     return null;
+};
+
+map._makeStringViaToPt = function(context, type, json, style) {
+    if (! json.vias || json.vias.length === 0) {
+        return [];
+    }
+    var from;
+    var to;
+
+    // At the moment, we have only one via in PathItem
+    if (json.path[json.path.length - 1].via_uri){
+        from = json.vias[0].access_point.coord;
+        to = map._getCoordFromPlace(json.to);
+    }
+    if (json.path[0].via_uri){
+        from = map._getCoordFromPlace(json.from);
+        to = json.vias[0].access_point.coord;
+    }
+
+    var style1 = utils.deepClone(style);
+    style1.color = 'white';
+    style1.weight = 7;
+    style1.opacity = 1;
+    style1.dashArray =  '0, 10';
+    var style2 = utils.deepClone(style);
+    style2.weight = 5;
+    style2.opacity = 1;
+    style2.dashArray =  '0, 10';
+
+    var sum =  summary.run(context, type, json);
+
+    return [
+        L.polyline([from, to], style1),
+        L.polyline([from, to], style2).bindPopup(sum)
+    ];
 };
 
 map._makeString = function(context, type, json, style) {

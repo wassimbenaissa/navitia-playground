@@ -232,6 +232,13 @@ summary.make.codes = function(context, json) {
     return $('<span>').text(text);
 };
 
+summary.make.vias = function(context, json) {
+    var res = $('<span>');
+    res.append(sprintf('%s via(s)  ', json.vias.length));
+    res.append(pictos.makeSnPicto('entrance'));
+    return res;
+};
+
 summary.make.warning = function(context, json) {
     return $('<span>').text(json.message);
 };
@@ -303,9 +310,20 @@ summary.make.section = function(context, section) {
         res.append(summary.makeSectionTime(section.departure_date_time,
                                            section.base_departure_date_time));
     }
+    if ('vias' in section) {
+        var via_type;
+        if (section.path[section.path.length - 1].via_uri){
+            via_type = 'entrance';
+        }
+        if (section.path[0].via_uri){
+            via_type = 'exit';
+        }
+        res.append(summary.makeSectionVias(section.vias, via_type));
+    }
     if ('to' in section) {
         res.append(sprintf(' to <strong>%s</strong>', utils.htmlEncode(section.to.name)));
     }
+
     if (pt) {
         res.append(summary.makeSectionTime(section.arrival_date_time,
                                            section.base_arrival_date_time));
@@ -824,7 +842,7 @@ summary.make.elevations = function(context, json) {
 
     var steep_threshold = Math.sin(5.0 * Math.PI / 180.0);
 
-    json.elevations.forEach(function(element, index, array) {
+    json.forEach(function(element, index, array) {
         if (index === 0) {
             return;
         }
@@ -859,6 +877,44 @@ summary.make.context = function(context, json) {
     }
     return res;
 };
+
+summary.make.access_point = function(context, ap) {
+    var res = $('<span/>');
+    res.append('name: ');
+    if (ap.name) {
+        $('<span/>')
+            .addClass('street')
+            .text(ap.name)
+            .appendTo(res);
+    }
+    res.append(' - ');
+    res.append('properties (');
+    if (ap.is_entrance && ap.is_entrance === true) {
+        res.append('is entrance');
+    }
+    res.append(' - ');
+    if (ap.is_exit && ap.is_exit === true) {
+        res.append('is exit');
+    }
+    res.append(') - ');
+    res.append('length: ');
+    if (ap.length) {
+        $('<span/>')
+            .addClass('street')
+            .text(sprintf('%s m', ap.length))
+            .appendTo(res);
+    }
+    res.append(' - ');
+    res.append('traversal time: ');
+    if (ap.traversal_time) {
+        $('<span/>')
+            .addClass('street')
+            .text(sprintf('%s m', ap.length))
+            .appendTo(res);
+    }
+    return res;
+};
+
 
 // add your summary view by adding:
 //   summary.make.{type} = function(context, json) { ... }
@@ -923,6 +979,18 @@ summary.makeSectionTime = function(dt, baseDt) {
     res.append(sprintf(' %s', summary.formatTime(dt)));
     return res;
 };
+
+summary.makeSectionVias = function(vias, via_type) {
+    var res = $('<span/>');
+    res.append(' via ');
+    vias.forEach(function(v){
+        res.append($('<span/>'));
+        res.append(pictos.makeSnPicto(via_type));
+        res.append(sprintf('  <strong>%s</strong>', utils.htmlEncode(v.access_point.name)));
+    });
+    return res;
+};
+
 
 summary.makeImpactedTime = function(amended, base) {
     var res = $('<span/>');
@@ -997,39 +1065,3 @@ summary.run = function(context, type, json) {
     return res;
 };
 
-summary.make.access_point = function(context, ap) {
-    var res = $('<span/>');
-    res.append('name: ');
-    if (ap.name) {
-        $('<span/>')
-            .addClass('street')
-            .text(ap.name)
-        .appendTo(res);
-    }
-    res.append(' - ');
-    res.append('properties (');
-    if (ap.is_entrance && ap.is_entrance === true) {
-        res.append('is entrance');
-    }
-    res.append(' - ');
-    if (ap.is_exit && ap.is_exit === true) {
-        res.append('is exit');
-    }
-    res.append(') - ');
-    res.append('length: ');
-    if (ap.length) {
-        $('<span/>')
-            .addClass('street')
-            .text(sprintf('%s m', ap.length))
-        .appendTo(res);
-    }
-    res.append(' - ');
-    res.append('traversal time: ');
-    if (ap.traversal_time) {
-        $('<span/>')
-            .addClass('street')
-            .text(sprintf('%s m', ap.length))
-        .appendTo(res);
-    }
-    return res;
-};

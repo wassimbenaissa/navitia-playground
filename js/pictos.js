@@ -102,6 +102,10 @@ pictos.makeSnPicto = function(mode) {
         img = 'RideSharing';
     } else if (mode === 'taxi') {
         img = 'Taxi';
+    } else if (mode === 'entrance') {
+        img = 'Entrance';
+    } else if (mode === 'exit') {
+        img = 'Exit';
     }
     return pictos.makeImg(img, mode);
 };
