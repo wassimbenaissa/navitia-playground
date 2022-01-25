@@ -569,9 +569,9 @@ map._makeStringViaToPt = function(context, type, json, style, draw_section_optio
     // At the moment, we have only one via in PathItem
     if (draw_section_option === map.DrawSectionOption.DRAWSTART){
         from = json.vias[0].access_point.coord;
-        to = json.to.stop_point.coord;
+        to = map._getCoordFromPlace(json.to);
     }else {
-        from = json.from.stop_point.coord;
+        from = map._getCoordFromPlace(json.from);
         to = json.vias[0].access_point.coord;
     }
 
