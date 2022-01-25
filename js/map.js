@@ -82,7 +82,9 @@ map.makeFeatures = {
         if (draw_section_option === undefined) {
             draw_section_option = map.DrawSectionOption.DRAWBOTH;
         }
-        return map._makeString(context, 'section', json, style).concat(map.makeFeatures.vias(context, json.vias || []))
+        return map._makeString(context, 'section', json, style)
+            .concat(map.makeFeatures.vias(context, json.vias || []))
+            .concat(map._makeStringViaToPt(context,'section', json, map.crowFlyStyle, draw_section_option))
             .concat(map._makeStopTimesMarker(context, json, style, draw_section_option));
     },
     line: function(context, json) {
@@ -179,7 +181,7 @@ map.makeFeatures = {
             return map.makeFeatures.pt_object(context, ap);
         };
         return utils.flatMap(json, bind);
-        },
+    },
     response: function(context, json) {
         var key = response.responseCollectionName(json);
         if (key === null) {
@@ -495,12 +497,11 @@ map._makeMarkerForAccessPoint = function(context, sp) {
 };
 
 map._makeAccessPointIcon = function() {
-    var greenIcon = L.icon({
+    return L.icon({
         iconUrl:      '../img/pictos/metro-marker.png',
         iconSize:     [30, 38], // size of the icon
         iconAnchor:   [10, 40], // point of the icon which will correspond to marker's location
     });
-    return greenIcon;
 };
 
 map._makeMarker = function(context, type, json, style, label, icon) {
@@ -557,6 +558,37 @@ map._getCoordFromPlace = function(place) {
         return place[place.embedded_type].coord;
     }
     return null;
+};
+
+map._makeStringViaToPt = function(context, type, json, style, draw_section_option) {
+    if (! json.vias || json.vias.length === 0) {
+        return [];
+    }
+    var from;
+    var to;
+    // At the moment, we have only one via in PathItem
+    if (draw_section_option === map.DrawSectionOption.DRAWSTART){
+        from = json.vias[0].access_point.coord;
+        to = json.to.stop_point.coord;
+    }else {
+        from = json.from.stop_point.coord;
+        to = json.vias[0].access_point.coord;
+    }
+
+    var style1 = utils.deepClone(style);
+    style1.color = 'grey';
+    style1.weight = 7;
+    style1.opacity = 1;
+    var style2 = utils.deepClone(style);
+    style2.weight = 5;
+    style2.opacity = 1;
+
+    var sum =  summary.run(context, type, json);
+
+    return [
+        L.polyline([from, to], style1),
+        L.polyline([from, to], style2).bindPopup(sum)
+    ];
 };
 
 map._makeString = function(context, type, json, style) {
