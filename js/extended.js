@@ -337,7 +337,7 @@ extended.make.path = function(context, json) {
 extended.make.vias = function(context, json) {
     var res = $('<div/>');
     (json.vias || []).forEach(function(obj, i) {
-        res.append(response.render(context, obj, 'place', 'access_point', i));
+        res.append(response.render(context, obj, 'pt_object', 'access_point', i));
     });
     return res;
 };

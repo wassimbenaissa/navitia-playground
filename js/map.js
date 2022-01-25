@@ -518,8 +518,12 @@ map._makeAccessPointIcon = function(json) {
         iconUrl = '../img/pictos/EntranceMarker.png';
     } else if (json.draw_exit) {
         iconUrl = '../img/pictos/ExitMarker.png';
-    } else {
-        return null;
+    } else if (json.is_entrance && json.is_exit) {
+        iconUrl = '../img/pictos/EntranceExitMarker.png';
+    } else if (json.is_entrance) {
+        iconUrl = '../img/pictos/EntranceMarker.png';
+    } else if (json.is_exit) {
+        iconUrl = '../img/pictos/ExitMarker.png';
     }
     return L.icon({
         iconUrl:      iconUrl,
