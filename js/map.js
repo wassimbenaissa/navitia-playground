@@ -576,12 +576,14 @@ map._makeStringViaToPt = function(context, type, json, style, draw_section_optio
     }
 
     var style1 = utils.deepClone(style);
-    style1.color = 'grey';
+    style1.color = 'white';
     style1.weight = 7;
     style1.opacity = 1;
+    style1.dashArray =  '0, 10';
     var style2 = utils.deepClone(style);
     style2.weight = 5;
     style2.opacity = 1;
+    style2.dashArray =  '0, 10';
 
     var sum =  summary.run(context, type, json);
 
