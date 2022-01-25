@@ -26,7 +26,6 @@ var storage;
 var summary;
 var utils;
 var d3;
-var pictos;
 
 var map = {};
 
