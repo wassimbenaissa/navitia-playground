@@ -234,7 +234,7 @@ summary.make.codes = function(context, json) {
 
 summary.make.vias = function(context, json) {
     var res = $('<span>');
-    res.append(sprintf('%s via(s)  ', json.length));
+    res.append(sprintf('%s via(s)  ', json.vias.length));
     res.append(pictos.makeSnPicto('entrance'));
     return res;
 };

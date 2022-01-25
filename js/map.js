@@ -83,8 +83,8 @@ map.makeFeatures = {
             draw_section_option = map.DrawSectionOption.DRAWBOTH;
         }
         return map._makeString(context, 'section', json, style)
-            .concat(map.makeFeatures.vias(context, json.vias || []))
-            .concat(map._makeStringViaToPt(context,'section', json, map.crowFlyStyle, draw_section_option))
+            .concat(map.makeFeatures.vias(context, json))
+            .concat(map._makeStringViaToPt(context,'section', json, map.crowFlyStyle))
             .concat(map._makeStopTimesMarker(context, json, style, draw_section_option));
     },
     line: function(context, json) {
@@ -168,7 +168,7 @@ map.makeFeatures = {
         return map._makeMarker(context, 'free_floating', json);
     },
     access_point: function(context, json) {
-        var icon = map._makeAccessPointIcon();
+        var icon = map._makeAccessPointIcon(json);
         return map._makeMarker(context, 'access_point', json, null, null, icon);
     },
     connection: function(context, json) {
@@ -177,10 +177,24 @@ map.makeFeatures = {
         });
     },
     vias: function(context, json) {
+        if (! json.vias) {
+            return [];
+        }
+        var draw_entrance = false;
+        var draw_exit = false;
+        if (json.path[json.path.length - 1].via_uri){
+            draw_entrance = true;
+        }
+        if (json.path[0].via_uri){
+            draw_exit = true;
+        }
         var bind = function(ap) {
-            return map.makeFeatures.pt_object(context, ap);
+            var new_ap = utils.deepClone(ap || {});
+            new_ap.access_point.draw_entrance = draw_entrance;
+            new_ap.access_point.draw_exit = draw_exit;
+            return map.makeFeatures.pt_object(context, new_ap);
         };
-        return utils.flatMap(json, bind);
+        return utils.flatMap(json.vias, bind);
     },
     response: function(context, json) {
         var key = response.responseCollectionName(json);
@@ -496,11 +510,21 @@ map._makeMarkerForAccessPoint = function(context, sp) {
     return ap_markers;
 };
 
-map._makeAccessPointIcon = function() {
+map._makeAccessPointIcon = function(json) {
+    var iconUrl;
+    if (json.draw_entrance && json.draw_exit) {
+        iconUrl = '../img/pictos/EntranceExitMarker.png';
+    } else if (json.draw_entrance) {
+        iconUrl = '../img/pictos/EntranceMarker.png';
+    } else if (json.draw_exit) {
+        iconUrl = '../img/pictos/ExitMarker.png';
+    } else {
+        return null;
+    }
     return L.icon({
-        iconUrl:      '../img/pictos/metro-marker.png',
-        iconSize:     [30, 38], // size of the icon
-        iconAnchor:   [10, 40], // point of the icon which will correspond to marker's location
+        iconUrl:      iconUrl,
+        iconSize:     [38, 50],
+        iconAnchor:   [19, 50], // point of the icon which will correspond to marker's location
     });
 };
 
@@ -560,17 +584,19 @@ map._getCoordFromPlace = function(place) {
     return null;
 };
 
-map._makeStringViaToPt = function(context, type, json, style, draw_section_option) {
+map._makeStringViaToPt = function(context, type, json, style) {
     if (! json.vias || json.vias.length === 0) {
         return [];
     }
     var from;
     var to;
+
     // At the moment, we have only one via in PathItem
-    if (draw_section_option === map.DrawSectionOption.DRAWSTART){
+    if (json.path[json.path.length - 1].via_uri){
         from = json.vias[0].access_point.coord;
         to = map._getCoordFromPlace(json.to);
-    }else {
+    }
+    if (json.path[0].via_uri){
         from = map._getCoordFromPlace(json.from);
         to = json.vias[0].access_point.coord;
     }
