@@ -513,17 +513,19 @@ map._makeMarkerForAccessPoint = function(context, sp) {
 map._makeAccessPointIcon = function(json) {
     var iconUrl;
     if (json.draw_entrance && json.draw_exit) {
-        iconUrl = '../img/pictos/EntranceExitMarker.png';
+        iconUrl = '/img/pictos/EntranceExitMarker.png';
     } else if (json.draw_entrance) {
-        iconUrl = '../img/pictos/EntranceMarker.png';
+        iconUrl =  '/img/pictos/EntranceMarker.png';
     } else if (json.draw_exit) {
-        iconUrl = '../img/pictos/ExitMarker.png';
+        iconUrl =  '/img/pictos/ExitMarker.png';
     } else if (json.is_entrance && json.is_exit) {
-        iconUrl = '../img/pictos/EntranceExitMarker.png';
+        iconUrl = '/img/pictos/EntranceExitMarker.png';
     } else if (json.is_entrance) {
-        iconUrl = '../img/pictos/EntranceMarker.png';
+        iconUrl = '/img/pictos/EntranceMarker.png';
     } else if (json.is_exit) {
-        iconUrl = '../img/pictos/ExitMarker.png';
+        iconUrl = '/img/pictos/ExitMarker.png';
+    } else {
+        return null;
     }
     return L.icon({
         iconUrl:      iconUrl,
