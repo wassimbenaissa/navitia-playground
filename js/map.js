@@ -529,7 +529,7 @@ map._makeAccessPointIcon = function(json) {
     }
     return L.icon({
         iconUrl:      iconUrl,
-        iconSize:     [38, 50],
+        iconSize:     [35, 46],
         iconAnchor:   [19, 50], // point of the icon which will correspond to marker's location
     });
 };
