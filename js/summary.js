@@ -909,7 +909,7 @@ summary.make.access_point = function(context, ap) {
     if (ap.traversal_time) {
         $('<span/>')
             .addClass('street')
-            .text(sprintf('%s m', ap.length))
+            .text(sprintf('%s s', ap.traversal_time))
             .appendTo(res);
     }
     return res;
