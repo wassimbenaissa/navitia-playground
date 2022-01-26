@@ -485,29 +485,35 @@ map.run = function(context, type, json) {
 };
 
 map._makeMarkerForAccessPoint = function(context, sp) {
-    var ap_markers = [];
     if (! sp.access_points){
-        return ap_markers;
+        return [];
     }
-    sp.access_points.forEach(function(ap) {
-        var obj = ap;
-        var type = 'access_point';
-        var sum = summary.run(context, type, ap);
-        var marker;
-        marker = L.marker([ap.coord.lat, ap.coord.lon]);
-        var style1 = {};
-        style1.color = 'gray';
-        style1.weight = 3;
-        style1.opacity = 1;
-        var connection = [{
-            'type': 'LineString',
-            'coordinates': [[sp.coord.lon, sp.coord.lat], [ap.coord.lon, ap.coord.lat]]
-        }];
-        ap_markers.push(L.geoJson(connection, { style: style1 }));
-        ap_markers.push(marker.bindPopup(map._makeLink(context, type, obj, sum)[0]));
+    var bind = function(ap) {
+        ap = utils.deepClone(ap || {});
+        ap.draw_entrance = ap.is_entrance;
+        ap.draw_exit = ap.is_exit;
+        var icon = map._makeAccessPointIcon(ap);
+        var marker =  map._makeMarker(context, 'access_point', ap, null, null, icon);
 
-    });
-    return ap_markers;
+        var style1 = utils.deepClone(map.crowFlyStyle);
+        style1.color = 'white';
+        style1.weight = 7;
+        style1.opacity = 10;
+        style1.dashArray =  '0, 12';
+        var style2 = utils.deepClone(map.crowFlyStyle);
+        style2.weight = 5;
+        style2.opacity = 10;
+        style2.dashArray =  '0, 12';
+
+        var from = ap.coord;
+        var to = sp.coord;
+
+        return marker.concat([
+            L.polyline([from, to], style1),
+            L.polyline([from, to], style2)
+        ]);
+    };
+    return utils.flatMap(sp.access_points, bind);
 };
 
 map._makeAccessPointIcon = function(json) {
@@ -529,8 +535,8 @@ map._makeAccessPointIcon = function(json) {
     }
     return L.icon({
         iconUrl:      iconUrl,
-        iconSize:     [35, 46],
-        iconAnchor:   [19, 50], // point of the icon which will correspond to marker's location
+        iconSize:     [32, 42.1],
+        iconAnchor:   [16, 42.1], // point of the icon which will correspond to marker's location
     });
 };
 
