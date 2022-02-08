@@ -62,7 +62,7 @@ response.setStatus = function(message, status, start_time) {
 response.responseCollectionName = function(json) {
     if (! (json instanceof Object)) { return null; }
     var key = null;
-    var notCollectionKeys = ['disruptions', 'links', 'feed_publishers', 'exceptions', 'notes', 'warnings', 'tickets'];
+    var notCollectionKeys = ['disruptions', 'links', 'feed_publishers', 'exceptions', 'notes', 'warnings', 'tickets', 'terminus'];
     for (var k in json) {
         if ($.isArray(json[k]) &&
             $.inArray(k, notCollectionKeys) === -1) {
