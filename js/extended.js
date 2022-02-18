@@ -66,6 +66,10 @@ extended.make.response = function(context, json) {
         result.append(response.render(context, note, 'note', 'notes', i));
     });
 
+    (json.terminus || []).forEach(function(terminus, i) {
+        result.append(response.render(context, terminus, 'terminus', 'terminus', i));
+    });
+
     (json.feed_publishers || []).forEach(function(feed_publisher, i) {
         result.append(response.render(context, feed_publisher, 'contributor', 'feed_publishers', i));
     });
