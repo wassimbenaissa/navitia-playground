@@ -458,10 +458,6 @@ summary.make.stop_schedule = function(context, json) {
     return summary.makeRoutePoint(context, json);
 };
 
-summary.make.vehicle_position = function(context, json) {
-    return summary.makeVehiclePosition(context, json);
-};
-
 summary.make.date_time = function(context, json) {
     var res = $('<span>');
     res.append(summary.makeImpactedTime(json.date_time, json.base_date_time));
@@ -1052,6 +1048,14 @@ summary.makeVehiclePosition = function(context, json) {
     var res = $('<span/>');
     res.append(summary.run(context, 'line', json.line));
     return res;
+};
+
+summary.make.vehicle_position = function(context, json) {
+    if ('line' in json) {
+        return summary.makeVehiclePosition(context, json);
+    } else {
+        return summary.makeVehicleJourneyPosition(context, json);
+    }
 };
 
 summary.make.vehicle_journey_position = function(context, json) {
