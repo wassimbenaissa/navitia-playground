@@ -177,6 +177,19 @@ extended.make.route_schedule = function(context, json) {
     return result;
 };
 
+
+extended.make.vehicle_position = function(context, json) {
+    var result = $('<div class="list"/>');
+    result.append(response.render(context, json.line, 'line', 'line'));
+    if (json.vehicle_journey_positions) {
+        json.vehicle_journey_positions.forEach(function(vehicle_journey_position, i) {
+            result.append(response.render(context, vehicle_journey_position, 'vehicle_journey_position',
+            'vehicle_journey_position', i));
+        });
+    }
+    return result;
+};
+
 extended.make.departure = function(context, json) {
     var result = $('<div class="list"/>');
     if (Array.isArray(json.links) && json.links.length) {

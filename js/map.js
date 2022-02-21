@@ -196,6 +196,16 @@ map.makeFeatures = {
         };
         return utils.flatMap(json.vias, bind);
     },
+    vehicle_position: function(context, json) {
+        if (! json.vehicle_journey_positions) { return []; }
+        var bind = function(s) {
+            return map.makeFeatures.vehicle_journey_position(context, s);
+        };
+        return utils.flatMap(json.vehicle_journey_positions, bind);
+    },
+    vehicle_journey_position: function(context, json) {
+        return map._makeMarker(context, 'vehicle_position', json);
+    },
     response: function(context, json) {
         var key = response.responseCollectionName(json);
         if (key === null) {
@@ -554,9 +564,13 @@ map._makeMarker = function(context, type, json, style, label, icon) {
         lon = json[json.embedded_type].coord.lon;
         break;
     default:
+        if (!json.coord){
+            return [];
+        }
         lat = json.coord.lat;
         lon = json.coord.lon;
     }
+
     var sum = summary.run(context, type, json);
     var t = type === 'place' ? json.embedded_type : type;
     var marker;
