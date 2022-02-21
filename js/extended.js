@@ -183,7 +183,8 @@ extended.make.vehicle_position = function(context, json) {
     result.append(response.render(context, json.line, 'line', 'line'));
     if (json.vehicle_journey_positions) {
         json.vehicle_journey_positions.forEach(function(vehicle_journey_position, i) {
-            result.append(response.render(context, vehicle_journey_position, 'vehicle_journey_position', 'vehicle_journey_position', i));
+            result.append(response.render(context, vehicle_journey_position, 'vehicle_journey_position',
+            'vehicle_journey_position', i));
         });
     }
     return result;
