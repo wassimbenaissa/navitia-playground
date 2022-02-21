@@ -198,7 +198,7 @@ map.makeFeatures = {
     },
     vehicle_position: function(context, json) {
         if (! json.vehicle_journey_positions) { return []; }
-        var bind = function(s, i, array) {
+        var bind = function(s) {
             return map.makeFeatures.vehicle_journey_position(context, s);
         };
         return utils.flatMap(json.vehicle_journey_positions, bind);
