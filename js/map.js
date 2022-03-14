@@ -61,7 +61,9 @@ map.makeFeatures = {
         switch (json.type) {
         case 'street_network':
             switch (json.mode) {
-            case 'bike': style = map.bikeStyle; break;
+            case 'bike':
+                return map._makeBikeStreetInfo(context, 'section', json)
+                    .concat(map._makeStopTimesMarker(context, json, style, draw_section_option));
             case 'taxi': style = map.taxiStyle; break;
             case 'car': style = map.carStyle; break;
             case 'carnopark': style = map.carStyle; break;
@@ -597,6 +599,10 @@ map._makeMarker = function(context, type, json, style, label, icon) {
 };
 
 map.bikeStyle = { color: '#a3ab3a', dashArray: '0, 8' };
+map.bikeStyleNoCycleLane = { color: '#04ed00', dashArray: '0, 8' };
+map.bikeStyleSharedCycleWay = { color: '#04ed00', dashArray: '0, 8' };
+map.bikeStyleSeparatedCycleWay = { color: '#04ed00', dashArray: '0, 8' };
+map.bikeStyleDedicatedCycleWay = { color: '#04ed00', dashArray: '0, 8' };
 map.carStyle = { color: '#c9731d', dashArray: '0, 8' };
 map.taxiStyle = { color: '#297e52', dashArray: '0, 8' };
 map.walkingStyle = { color: '#298bbc', dashArray: '0, 8' };
@@ -643,6 +649,104 @@ map._makeStringViaToPt = function(context, type, json, style) {
         L.polyline([from, to], style1),
         L.polyline([from, to], style2).bindPopup(sum)
     ];
+};
+
+map._makeSubGeojson = function(geojson, start, end) {
+    var res = utils.deepClone(geojson);
+    res.coordinates = geojson.coordinates.slice(start, end+1);
+    return res;
+};
+
+map._makeBikeStreetInfo = function(context, type, json) {
+    var style1 = utils.deepClone(map.bikeStyleNoCycleLane);
+    style1.color = 'white';
+    style1.weight = 7;
+    style1.opacity = 1;
+    var style2 = utils.deepClone(map.bikeStyleSharedCycleWay);
+    style1.color = 'white';
+    style1.weight = 7;
+    style1.opacity = 1;
+    var style3 = utils.deepClone(map.bikeStyleDedicatedCycleWay);
+    style1.color = 'white';
+    style1.weight = 7;
+    style1.opacity = 1;
+    var style4 = utils.deepClone(map.bikeStyleSeparatedCycleWay);
+    style1.color = 'white';
+    style1.weight = 7;
+    style1.opacity = 1;
+    var style5 = utils.deepClone(map.bikeStyle);
+    style1.weight = 5;
+    style1.opacity = 1;
+
+    var line = [];
+    var subGeojson;
+    var new_json;
+    var sum;
+
+    if (json.street_information && json.street_information.length && json.geojson && json.geojson.coordinates.length) {
+        var from_offset = json.street_information[0].geojson_offset;
+
+        for (var idx = 1; idx < json.street_information.length; idx++) {
+            var street_info = json.street_information[idx - 1];
+            var offset = json.street_information[idx].geojson_offset;
+
+            subGeojson = map._makeSubGeojson(json.geojson, from_offset, offset);
+            new_json = utils.deepClone(json);
+            new_json.street_info = street_info;
+            sum = summary.run(context, type, new_json);
+            if (street_info.cycle_path_type === 'NoCycleLane') {
+                line.push(
+                    L.geoJson(subGeojson, { style: style1 }),
+                    L.geoJson(subGeojson, { style: style5 }).bindPopup(sum)
+                );
+            } else if (street_info.cycle_path_type === 'SharedCycleWay') {
+                line.push(
+                    L.geoJson(subGeojson, { style: style2 }),
+                    L.geoJson(subGeojson, { style: style5 }).bindPopup(sum)
+                );
+            } else if (street_info.cycle_path_type === 'DedicatedCycleWay') {
+                line.push(
+                    L.geoJson(subGeojson, { style: style3 }),
+                    L.geoJson(subGeojson, { style: style5 }).bindPopup(sum)
+                );
+            } else if (street_info.cycle_path_type === 'SeparatedCycleWay') {
+                line.push(
+                    L.geoJson(subGeojson, { style: style4 }),
+                    L.geoJson(subGeojson, { style: style5 }).bindPopup(sum)
+                );
+            }
+
+            from_offset = offset;
+        }
+
+        subGeojson = map._makeSubGeojson(json.geojson, from_offset, json.geojson.coordinates.length);
+        new_json = utils.deepClone(json);
+        new_json.street_info = json.street_information[json.street_information.length-1];
+        sum = summary.run(context, type, new_json);
+        if (new_json.street_info.cycle_path_type === 'NoCycleLane') {
+            line.push(
+                L.geoJson(subGeojson, { style: style1 }),
+                L.geoJson(subGeojson, { style: style5 }).bindPopup(sum)
+            );
+        } else if (new_json.street_info.cycle_path_type === 'SharedCycleWay') {
+            line.push(
+                L.geoJson(subGeojson, { style: style2 }),
+                L.geoJson(subGeojson, { style: style5 }).bindPopup(sum)
+            );
+        } else if (new_json.street_info.cycle_path_type === 'DedicatedCycleWay') {
+            line.push(
+                L.geoJson(subGeojson, { style: style3 }),
+                L.geoJson(subGeojson, { style: style5 }).bindPopup(sum)
+            );
+        } else if (new_json.street_info.cycle_path_type === 'SeparatedCycleWay') {
+            line.push(
+                L.geoJson(subGeojson, { style: style4 }),
+                L.geoJson(subGeojson, { style: style5 }).bindPopup(sum)
+            );
+        }
+
+    }
+    return line;
 };
 
 map._makeString = function(context, type, json, style) {

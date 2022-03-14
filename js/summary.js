@@ -372,6 +372,9 @@ summary.make.section = function(context, section) {
             res.append(utils.htmlEncode(sprintf(', network: %s, operator: %s', infos.network, infos.operator)));
         }
     }
+    if (section.street_info) {
+        res.append(section.street_info.cycle_path_type);
+    }
     return res;
 };
 
