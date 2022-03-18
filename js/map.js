@@ -599,10 +599,10 @@ map._makeMarker = function(context, type, json, style, label, icon) {
 };
 
 map.bikeStyle = { color: '#a3ab3a', dashArray: '0, 8' };
-map.bikeStyleNoCycleLane = { color: '#04ed00', dashArray: '0, 8' };
-map.bikeStyleSharedCycleWay = { color: '#04ed00', dashArray: '0, 8' };
-map.bikeStyleSeparatedCycleWay = { color: '#04ed00', dashArray: '0, 8' };
-map.bikeStyleDedicatedCycleWay = { color: '#04ed00', dashArray: '0, 8' };
+map.bikeStyleNoCycleLane = { color: '#414417', dashArray: '0, 8' };
+map.bikeStyleSharedCycleWay = { color: '#616622', dashArray: '0, 8' };
+map.bikeStyleSeparatedCycleWay = { color: '#82882e', dashArray: '0, 8' };
+map.bikeStyleDedicatedCycleWay = { color: '#a3ab3a', dashArray: '0, 8' };
 map.carStyle = { color: '#c9731d', dashArray: '0, 8' };
 map.taxiStyle = { color: '#297e52', dashArray: '0, 8' };
 map.walkingStyle = { color: '#298bbc', dashArray: '0, 8' };
@@ -658,93 +658,59 @@ map._makeSubGeojson = function(geojson, start, end) {
 };
 
 map._makeBikeStreetInfo = function(context, type, json) {
-    var style1 = utils.deepClone(map.bikeStyleNoCycleLane);
-    style1.color = 'white';
-    style1.weight = 7;
-    style1.opacity = 1;
-    var style2 = utils.deepClone(map.bikeStyleSharedCycleWay);
-    style1.color = 'white';
-    style1.weight = 7;
-    style1.opacity = 1;
-    var style3 = utils.deepClone(map.bikeStyleDedicatedCycleWay);
-    style1.color = 'white';
-    style1.weight = 7;
-    style1.opacity = 1;
-    var style4 = utils.deepClone(map.bikeStyleSeparatedCycleWay);
-    style1.color = 'white';
-    style1.weight = 7;
-    style1.opacity = 1;
-    var style5 = utils.deepClone(map.bikeStyle);
-    style1.weight = 5;
-    style1.opacity = 1;
+    var cycleLaneTypeStyles = {
+        'NoCycleLane': map.bikeStyleNoCycleLane,
+        'SharedCycleWay': map.bikeStyleSharedCycleWay,
+        'SeparatedCycleWay': map.bikeStyleSeparatedCycleWay,
+        'DedicatedCycleWay': map.bikeStyleDedicatedCycleWay
+    };
+
+    var styleWhite = utils.deepClone(map.bikeStyleNoCycleLane);
+    styleWhite.color = 'white';
+    styleWhite.weight = 7;
+    styleWhite.opacity = 1;
 
     var line = [];
     var subGeojson;
-    var new_json;
+    var newJson;
     var sum;
 
     if (json.street_information && json.street_information.length && json.geojson && json.geojson.coordinates.length) {
-        var from_offset = json.street_information[0].geojson_offset;
+        var fromOffset = json.street_information[0].geojson_offset;
 
         for (var idx = 1; idx < json.street_information.length; idx++) {
-            var street_info = json.street_information[idx - 1];
+            var streetInfo = json.street_information[idx - 1];
             var offset = json.street_information[idx].geojson_offset;
 
-            subGeojson = map._makeSubGeojson(json.geojson, from_offset, offset);
-            new_json = utils.deepClone(json);
-            new_json.street_info = street_info;
-            sum = summary.run(context, type, new_json);
-            if (street_info.cycle_path_type === 'NoCycleLane') {
+            subGeojson = map._makeSubGeojson(json.geojson, fromOffset, offset);
+            newJson = utils.deepClone(json);
+            newJson.streetInfo = streetInfo;
+            sum = summary.run(context, type, newJson);
+
+            if (streetInfo.cycle_path_type in cycleLaneTypeStyles) {
+                cycleLaneTypeStyles[streetInfo.cycle_path_type].weight = 5;
+                cycleLaneTypeStyles[streetInfo.cycle_path_type].opacity = 1;
                 line.push(
-                    L.geoJson(subGeojson, { style: style1 }),
-                    L.geoJson(subGeojson, { style: style5 }).bindPopup(sum)
-                );
-            } else if (street_info.cycle_path_type === 'SharedCycleWay') {
-                line.push(
-                    L.geoJson(subGeojson, { style: style2 }),
-                    L.geoJson(subGeojson, { style: style5 }).bindPopup(sum)
-                );
-            } else if (street_info.cycle_path_type === 'DedicatedCycleWay') {
-                line.push(
-                    L.geoJson(subGeojson, { style: style3 }),
-                    L.geoJson(subGeojson, { style: style5 }).bindPopup(sum)
-                );
-            } else if (street_info.cycle_path_type === 'SeparatedCycleWay') {
-                line.push(
-                    L.geoJson(subGeojson, { style: style4 }),
-                    L.geoJson(subGeojson, { style: style5 }).bindPopup(sum)
+                    L.geoJson(subGeojson, { style: styleWhite }),
+                    L.geoJson(subGeojson, { style: cycleLaneTypeStyles[streetInfo.cycle_path_type] }).bindPopup(sum)
                 );
             }
-
-            from_offset = offset;
+            fromOffset = offset;
         }
 
-        subGeojson = map._makeSubGeojson(json.geojson, from_offset, json.geojson.coordinates.length);
-        new_json = utils.deepClone(json);
-        new_json.street_info = json.street_information[json.street_information.length-1];
-        sum = summary.run(context, type, new_json);
-        if (new_json.street_info.cycle_path_type === 'NoCycleLane') {
+        subGeojson = map._makeSubGeojson(json.geojson, fromOffset, json.geojson.coordinates.length);
+        newJson = utils.deepClone(json);
+        newJson.streetInfo = json.street_information[json.street_information.length-1];
+        sum = summary.run(context, type, newJson);
+
+        if (newJson.streetInfo.cycle_path_type in cycleLaneTypeStyles) {
+            cycleLaneTypeStyles[streetInfo.cycle_path_type].weight = 5;
+            cycleLaneTypeStyles[streetInfo.cycle_path_type].opacity = 1;
             line.push(
-                L.geoJson(subGeojson, { style: style1 }),
-                L.geoJson(subGeojson, { style: style5 }).bindPopup(sum)
-            );
-        } else if (new_json.street_info.cycle_path_type === 'SharedCycleWay') {
-            line.push(
-                L.geoJson(subGeojson, { style: style2 }),
-                L.geoJson(subGeojson, { style: style5 }).bindPopup(sum)
-            );
-        } else if (new_json.street_info.cycle_path_type === 'DedicatedCycleWay') {
-            line.push(
-                L.geoJson(subGeojson, { style: style3 }),
-                L.geoJson(subGeojson, { style: style5 }).bindPopup(sum)
-            );
-        } else if (new_json.street_info.cycle_path_type === 'SeparatedCycleWay') {
-            line.push(
-                L.geoJson(subGeojson, { style: style4 }),
-                L.geoJson(subGeojson, { style: style5 }).bindPopup(sum)
+                L.geoJson(subGeojson, { style: styleWhite }),
+                L.geoJson(subGeojson, { style: cycleLaneTypeStyles[newJson.streetInfo.cycle_path_type] }).bindPopup(sum)
             );
         }
-
     }
     return line;
 };

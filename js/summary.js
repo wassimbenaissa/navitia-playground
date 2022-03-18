@@ -303,6 +303,10 @@ summary.make.section = function(context, section) {
     default: res.append(section.type); break;
     }
 
+    if (section.street_info) {
+        res.append(' (', section.street_info.cycle_path_type, ')');
+    }
+
     if ('from' in section) {
         res.append(sprintf(' from <strong>%s</strong>', utils.htmlEncode(section.from.name)));
     }
@@ -371,9 +375,6 @@ summary.make.section = function(context, section) {
         if (infos.network && infos.operator) {
             res.append(utils.htmlEncode(sprintf(', network: %s, operator: %s', infos.network, infos.operator)));
         }
-    }
-    if (section.street_info) {
-        res.append(section.street_info.cycle_path_type);
     }
     return res;
 };
