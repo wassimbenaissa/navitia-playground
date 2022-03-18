@@ -704,8 +704,8 @@ map._makeBikeStreetInfo = function(context, type, json) {
         sum = summary.run(context, type, newJson);
 
         if (newJson.streetInfo.cycle_path_type in cycleLaneTypeStyles) {
-            cycleLaneTypeStyles[streetInfo.cycle_path_type].weight = 5;
-            cycleLaneTypeStyles[streetInfo.cycle_path_type].opacity = 1;
+            cycleLaneTypeStyles[newJson.streetInfo.cycle_path_type].weight = 5;
+            cycleLaneTypeStyles[newJson.streetInfo.cycle_path_type].opacity = 1;
             line.push(
                 L.geoJson(subGeojson, { style: styleWhite }),
                 L.geoJson(subGeojson, { style: cycleLaneTypeStyles[newJson.streetInfo.cycle_path_type] }).bindPopup(sum)
