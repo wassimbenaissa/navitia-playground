@@ -351,10 +351,16 @@ extended.make.path = function(context, json) {
     return res;
 };
 
+extended.make.via = function(context, json) {
+    var res = $('<div/>');
+    res.append(response.render(context, json.access_point, 'access_point', 'access_point'));
+    return res;
+};
+
 extended.make.vias = function(context, json) {
     var res = $('<div/>');
     (json.vias || []).forEach(function(obj, i) {
-        res.append(response.render(context, obj, 'access_point', 'via', i));
+        res.append(response.render(context, obj, 'via', 'via', i));
     });
     return res;
 };

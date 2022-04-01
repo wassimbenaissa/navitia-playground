@@ -176,6 +176,10 @@ map.makeFeatures = {
             return map._makeMarker(context, 'stop_point', json);
         });
     },
+    via: function(context, json) {
+        var icon = map._makeAccessPointIcon(json);
+        return map._makeMarker(context, 'via', json, null, null, icon);
+    },
     vias: function(context, json) {
         if (! json.vias) {
             return [];
@@ -192,7 +196,7 @@ map.makeFeatures = {
             var new_ap = utils.deepClone(ap || {});
             new_ap.draw_entrance = draw_entrance;
             new_ap.draw_exit = draw_exit;
-            return map.makeFeatures.access_point(context, new_ap);
+            return map.makeFeatures.via(context, new_ap);
         };
         return utils.flatMap(json.vias, bind);
     },
@@ -503,7 +507,7 @@ map._makeMarkerForAccessPoint = function(context, sp) {
         ap.draw_entrance = ap.is_entrance;
         ap.draw_exit = ap.is_exit;
         var icon = map._makeAccessPointIcon(ap);
-        var marker =  map._makeMarker(context, 'access_point', ap, null, null, icon);
+        var marker =  map._makeMarker(context, 'via', ap, null, null, icon);
 
         var style1 = utils.deepClone(map.crowFlyStyle);
         style1.color = 'white';
@@ -541,7 +545,7 @@ map._makeAccessPointIcon = function(json) {
     } else if (json.is_exit) {
         iconUrl = 'img/pictos/ExitMarker.png';
     } else {
-        iconUrl = 'img/pictos/MapMarker.png';
+        return;
     }
     return L.icon({
         iconUrl:      iconUrl,
@@ -563,7 +567,7 @@ map._makeMarker = function(context, type, json, style, label, icon) {
         lat = json[json.embedded_type].coord.lat;
         lon = json[json.embedded_type].coord.lon;
         break;
-    case 'access_point':
+    case 'via':
         lat = json.access_point.coord.lat;
         lon = json.access_point.coord.lon;
         break;

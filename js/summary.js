@@ -878,7 +878,7 @@ summary.make.context = function(context, json) {
     return res;
 };
 
-summary.make.access_point = function(context, ap) {
+summary.make.via = function(context, ap) {
     var res = $('<span/>');
     res.append('name: ');
     if (ap.name) {
