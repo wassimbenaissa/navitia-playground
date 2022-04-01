@@ -1062,6 +1062,7 @@ summary.make.vehicle_journey_position = function(context, json) {
     return summary.makeVehicleJourneyPosition(context, json);
 };
 
+
 summary.makeVehicleJourneyPosition = function(context, json) {
     var res = $('<span>');
     res.append(json.vehicle_journey.name);

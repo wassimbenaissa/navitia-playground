@@ -190,9 +190,9 @@ map.makeFeatures = {
         }
         var bind = function(ap) {
             var new_ap = utils.deepClone(ap || {});
-            new_ap.access_point.draw_entrance = draw_entrance;
-            new_ap.access_point.draw_exit = draw_exit;
-            return map.makeFeatures.pt_object(context, new_ap);
+            new_ap.draw_entrance = draw_entrance;
+            new_ap.draw_exit = draw_exit;
+            return map.makeFeatures.access_point(context, new_ap);
         };
         return utils.flatMap(json.vias, bind);
     },
@@ -541,7 +541,7 @@ map._makeAccessPointIcon = function(json) {
     } else if (json.is_exit) {
         iconUrl = 'img/pictos/ExitMarker.png';
     } else {
-        return null;
+        iconUrl = 'img/pictos/MapMarker.png';
     }
     return L.icon({
         iconUrl:      iconUrl,
@@ -562,6 +562,10 @@ map._makeMarker = function(context, type, json, style, label, icon) {
     case 'place':
         lat = json[json.embedded_type].coord.lat;
         lon = json[json.embedded_type].coord.lon;
+        break;
+    case 'access_point':
+        lat = json.access_point.coord.lat;
+        lon = json.access_point.coord.lon;
         break;
     default:
         if (!json.coord){
