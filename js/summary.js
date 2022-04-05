@@ -878,7 +878,7 @@ summary.make.context = function(context, json) {
     return res;
 };
 
-summary.make.access_point = function(context, ap) {
+summary.make.via = function(context, ap) {
     var res = $('<span/>');
     res.append('name: ');
     if (ap.name) {
@@ -1061,6 +1061,7 @@ summary.make.vehicle_position = function(context, json) {
 summary.make.vehicle_journey_position = function(context, json) {
     return summary.makeVehicleJourneyPosition(context, json);
 };
+
 
 summary.makeVehicleJourneyPosition = function(context, json) {
     var res = $('<span>');
