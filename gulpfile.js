@@ -167,13 +167,24 @@ function compile_html(env){
 gulp.task('dev:minify_html', compile_html('dev'));
 gulp.task('prod:minify_html', compile_html('prod'));
 
+// Add CNAME if exist
+function add_cname(env){
+    return function() {
+        return gulp.src('CNAME')
+        .pipe(gulp.dest(config[env]))
+    }
+}
+gulp.task('dev:add_cname', add_cname('dev'));
+gulp.task('prod:add_cname', add_cname('prod'));
+
 // Watch Files For Changes
 function watch(env){
     return function() {
         gulp.watch('js/**/*.js', gulp.series(env + ':scripts'));
         gulp.watch('scss/**/*.scss', gulp.series(env + ':sass'));
         gulp.watch('img/**', gulp.series(env + ':img'));
-        gulp.watch('app/**', gulp.series(env + ':minify_html'));
+        gulp.watch('app/*.html', gulp.series(env + ':minify_html'));
+        gulp.watch('CNAME', gulp.series(env + ':add_cname'));
         browserSync.init(config.browsersync[env]);
     }
 }
@@ -187,7 +198,8 @@ function build(env) {
                             env + ':sass', 
                             env + ':bower',
                             env + ':img',
-                            env + ':minify_html')
+                            env + ':minify_html',
+                            env + ':add_cname')
     );
 }
 gulp.task('dev:build', build('dev'));
