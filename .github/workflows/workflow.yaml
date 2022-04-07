@@ -13,8 +13,8 @@ jobs:
 
     strategy:
       matrix:
-        # We deploy with Node 8.x ! We test with Node 14.x for futur upgrade
-        node-version: [14.x, 16.x]
+        # We deploy with Node 14.x ! We test with Node 15.x for futur upgrade
+        node-version: [14.x, 15.x]
 
     steps:
     - uses: actions/checkout@v2
