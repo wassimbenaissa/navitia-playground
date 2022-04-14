@@ -61,7 +61,9 @@ map.makeFeatures = {
         switch (json.type) {
         case 'street_network':
             switch (json.mode) {
-            case 'bike': style = map.bikeStyle; break;
+            case 'bike':
+                return map._makeBikeStreetInfo(context, 'section', json)
+                    .concat(map._makeStopTimesMarker(context, json, style, draw_section_option));
             case 'taxi': style = map.taxiStyle; break;
             case 'car': style = map.carStyle; break;
             case 'carnopark': style = map.carStyle; break;
@@ -605,6 +607,10 @@ map._makeMarker = function(context, type, json, style, label, icon) {
 };
 
 map.bikeStyle = { color: '#a3ab3a', dashArray: '0, 8' };
+map.bikeStyleNoCycleLane = { color: '#414417', dashArray: '0, 8' };
+map.bikeStyleSharedCycleWay = { color: '#616622', dashArray: '0, 8' };
+map.bikeStyleSeparatedCycleWay = { color: '#82882e', dashArray: '0, 8' };
+map.bikeStyleDedicatedCycleWay = { color: '#a3ab3a', dashArray: '0, 8' };
 map.carStyle = { color: '#c9731d', dashArray: '0, 8' };
 map.taxiStyle = { color: '#297e52', dashArray: '0, 8' };
 map.walkingStyle = { color: '#298bbc', dashArray: '0, 8' };
@@ -651,6 +657,70 @@ map._makeStringViaToPt = function(context, type, json, style) {
         L.polyline([from, to], style1),
         L.polyline([from, to], style2).bindPopup(sum)
     ];
+};
+
+map._makeSubGeojson = function(geojson, start, end) {
+    var res = utils.deepClone(geojson);
+    res.coordinates = geojson.coordinates.slice(start, end+1);
+    return res;
+};
+
+map._makeBikeStreetInfo = function(context, type, json) {
+    var cycleLaneTypeStyles = {
+        'NoCycleLane': map.bikeStyleNoCycleLane,
+        'SharedCycleWay': map.bikeStyleSharedCycleWay,
+        'SeparatedCycleWay': map.bikeStyleSeparatedCycleWay,
+        'DedicatedCycleWay': map.bikeStyleDedicatedCycleWay
+    };
+
+    var styleWhite = utils.deepClone(map.bikeStyleNoCycleLane);
+    styleWhite.color = 'white';
+    styleWhite.weight = 7;
+    styleWhite.opacity = 1;
+
+    var line = [];
+    var subGeojson;
+    var newJson;
+    var sum;
+
+    if (json.street_information && json.street_information.length && json.geojson && json.geojson.coordinates.length) {
+        var fromOffset = json.street_information[0].geojson_offset;
+
+        for (var idx = 1; idx < json.street_information.length; idx++) {
+            var streetInfo = json.street_information[idx - 1];
+            var offset = json.street_information[idx].geojson_offset;
+
+            subGeojson = map._makeSubGeojson(json.geojson, fromOffset, offset);
+            newJson = utils.deepClone(json);
+            newJson.streetInfo = streetInfo;
+            sum = summary.run(context, type, newJson);
+
+            if (streetInfo.cycle_path_type in cycleLaneTypeStyles) {
+                cycleLaneTypeStyles[streetInfo.cycle_path_type].weight = 5;
+                cycleLaneTypeStyles[streetInfo.cycle_path_type].opacity = 1;
+                line.push(
+                    L.geoJson(subGeojson, { style: styleWhite }),
+                    L.geoJson(subGeojson, { style: cycleLaneTypeStyles[streetInfo.cycle_path_type] }).bindPopup(sum)
+                );
+            }
+            fromOffset = offset;
+        }
+
+        subGeojson = map._makeSubGeojson(json.geojson, fromOffset, json.geojson.coordinates.length);
+        newJson = utils.deepClone(json);
+        newJson.streetInfo = json.street_information[json.street_information.length-1];
+        sum = summary.run(context, type, newJson);
+
+        if (newJson.streetInfo.cycle_path_type in cycleLaneTypeStyles) {
+            cycleLaneTypeStyles[newJson.streetInfo.cycle_path_type].weight = 5;
+            cycleLaneTypeStyles[newJson.streetInfo.cycle_path_type].opacity = 1;
+            line.push(
+                L.geoJson(subGeojson, { style: styleWhite }),
+                L.geoJson(subGeojson, { style: cycleLaneTypeStyles[newJson.streetInfo.cycle_path_type] }).bindPopup(sum)
+            );
+        }
+    }
+    return line;
 };
 
 map._makeString = function(context, type, json, style) {
