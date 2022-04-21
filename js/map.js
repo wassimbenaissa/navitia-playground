@@ -686,16 +686,17 @@ map._makeBikeStreetInfo = function(context, type, json) {
         'dedicated_cycle_way': map.bikeStyleDedicatedCycleWay
     };
 
-    var styleWhite = utils.deepClone(map.bikeStyleNoCycleLane);
-    styleWhite.color = 'white';
-    styleWhite.weight = 7;
-    styleWhite.opacity = 1;
+    var styleWhite = { color: 'white', dashArray: '0, 8', weight: 7, opacity: 1 };
 
     var line = [];
     var subGeojson;
     var newJson;
 
-    if (json.street_informations && json.street_informations.length && json.geojson && json.geojson.coordinates.length) {
+    if (json.street_informations
+        && json.street_informations.length
+        && json.geojson
+        && json.geojson.coordinates !== undefined
+        && json.geojson.coordinates.length) {
         var fromOffset = json.street_informations[0].geojson_offset;
 
         for (var idx = 1; idx < json.street_informations.length; idx++) {
