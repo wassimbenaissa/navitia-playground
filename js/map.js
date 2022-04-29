@@ -62,8 +62,12 @@ map.makeFeatures = {
         case 'street_network':
             switch (json.mode) {
             case 'bike':
-                return map._makeBikeStreetInfo(context, 'section', json)
+                if (!json.street_informations) {
+                    style = map.bikeStyle; break;
+                } else if (json.street_informations && json.street_informations.length) {
+                    return map._makeBikeStreetInfo(context, 'section', json)
                     .concat(map._makeStopTimesMarker(context, json, style, draw_section_option));
+                } break;
             case 'taxi': style = map.taxiStyle; break;
             case 'car': style = map.carStyle; break;
             case 'carnopark': style = map.carStyle; break;
