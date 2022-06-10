@@ -340,7 +340,7 @@ map.createMap = function(handle) {
 
     m.on('moveend', function() { storage.saveBounds(m.getBounds()); });
 
-    setTimeout(function() {
+    setTimeout(function() {map.bikeStyleNoCycleLane = { color: '#ed2939', dashArray: '0, 8' };
         if (bounds) { m.fitBounds(bounds); } else { m.fitWorld(); }
         circle.addTo(m); // workaround for https://github.com/Leaflet/Leaflet/issues/4978
     }, 100);
@@ -434,7 +434,7 @@ map.makeElevationGraph.elevations = function(context, json) {
             // It's impossible(?) to get the div's width, since it's not yet added to DOM...
             // the default width is set to 1600 as a good guess...
             var width = div_elevation.width() || 1600;
-
+map.bikeStyleNoCycleLane = { color: '#ed2939', dashArray: '0, 8' };
             // Scale the range of the data
             xScale.domain(d3.extent(data, function(d) { return d.distance_from_start;}));
             xScale.range([0, width - 50]);
@@ -611,10 +611,10 @@ map._makeMarker = function(context, type, json, style, label, icon) {
 };
 
 map.bikeStyle = { color: '#a3ab3a', dashArray: '0, 8' };
-map.bikeStyleNoCycleLane = { color: '#ed2939', dashArray: '0, 8' };
-map.bikeStyleSharedCycleWay = { color: '#ff7b00', dashArray: '0, 8' };
-map.bikeStyleDedicatedCycleWay = { color: '#fee832', dashArray: '0, 8' };
-map.bikeStyleSeparatedCycleWay = { color: '#006b3e', dashArray: '0, 8' };
+map.bikeStyleNoCycleLane = { color: '#cd6155', dashArray: '0, 8' };
+map.bikeStyleSharedCycleWay = { color: '#e59866', dashArray: '0, 8' };
+map.bikeStyleDedicatedCycleWay = { color: '#82e0aa', dashArray: '0, 8' };
+map.bikeStyleSeparatedCycleWay = { color: '#239b56', dashArray: '0, 8' };
 map.carStyle = { color: '#c9731d', dashArray: '0, 8' };
 map.taxiStyle = { color: '#297e52', dashArray: '0, 8' };
 map.walkingStyle = { color: '#298bbc', dashArray: '0, 8' };
