@@ -119,7 +119,7 @@ pictos.makeEquipmentPicto = function(equipment) {
     case 'has_bike_accepted':
     case 'has_bike_depot':
         img = 'BikeAccepted'; break;
-    case 'has_air_conditioned': img = 'AirCoditioning'; break;
+    case 'has_air_conditioned': img = 'AirConditioning'; break;
     case 'has_visual_announcement': img = 'HearingImpairment'; break;
     case 'has_audible_announcement': img = 'VisualImpairment'; break;
     case 'has_appropriate_escort': img = ''; break;
